@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿// #nullable disable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -10,15 +10,15 @@ namespace CSharpLibraries.Algorithms.Structures
 {
     
     // ReSharper disable once UnusedType.Global
-    public sealed class FibonacciHeap<TKey, TValue>
+    public sealed class FibonacciHeap<TKey, TValue> where TValue : notnull
     {
         #region InnerClass
         internal sealed class Node
         {
             internal TKey Key;
             internal readonly TValue Value;
-            internal Node Parent;
-            internal Node ChildList; // int linked, circular list
+            internal Node? Parent;
+            internal Node? ChildList; // int linked, circular list
             internal Node Left;
             internal Node Right;
             internal int Degree; // number of children
@@ -38,9 +38,9 @@ namespace CSharpLibraries.Algorithms.Structures
         #endregion
 
 
-        internal Node RootList;
+        internal Node? RootList;
         public int Count { get; internal set; } // number of nodes
-        private readonly Dictionary<TValue, Node> _valueToNodeMap = new Dictionary<TValue, Node>();
+        private readonly Dictionary<TValue, Node> _valueToNodeMap = new();
         private readonly Func<TKey, TKey, int> _keyComparer;
         private int UpperBound => (int) (Math.Log(Count) / Math.Log(2));
 
@@ -68,7 +68,7 @@ namespace CSharpLibraries.Algorithms.Structures
         {
             if (Count <= 0) throw new InvalidOperationException("Null heap.");
             var z = RootList;
-            var childList = z.ChildList; // add root_list's children list to root list
+            var childList = z!.ChildList; // add root_list's children list to root list
             var p = childList;
             if (p != null)
             {
@@ -76,7 +76,7 @@ namespace CSharpLibraries.Algorithms.Structures
                 {
                     var t = p.Right;
                     p.Parent = null;
-                    AddNodeToList(p, RootList);
+                    AddNodeToList(p, RootList!);
                     p = t;
                 } while (!ReferenceEquals(p, childList));
             }
@@ -92,7 +92,7 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private void Consolidate()
         {
-            var array = new Node[UpperBound + 1];
+            var array = new Node?[UpperBound + 1];
             var w = RootList;
             if (w == null) return;
 
@@ -106,7 +106,7 @@ namespace CSharpLibraries.Algorithms.Structures
                 while (array[d] != null)
                 {
                     var y = array[d]; // y stored node
-                    if (_keyComparer(x.Key, y.Key) > 0)
+                    if (_keyComparer(x.Key, y!.Key) > 0)
                     {
                         // exchange pointer
                         var t = x;
@@ -151,8 +151,8 @@ namespace CSharpLibraries.Algorithms.Structures
         {
             NotNullArg(f2,nameof(f2));
             var res = new FibonacciHeap<TKey, TValue>(_keyComparer) {RootList = RootList};
-            var f1Right = RootList.Right; // concatenate two root list
-            var f2Left = f2.RootList.Left;
+            var f1Right = RootList!.Right; // concatenate two root list
+            var f2Left = f2.RootList!.Left;
             RootList.Right = f2.RootList;
             f2.RootList.Left = RootList;
             f1Right.Left = f2Left;
@@ -183,7 +183,7 @@ namespace CSharpLibraries.Algorithms.Structures
                 }
             }
 
-            if (_keyComparer(x.Key, RootList.Key) <= 0) RootList = x;
+            if (_keyComparer(x.Key, RootList!.Key) <= 0) RootList = x;
         }
 
         internal void DecreaseKey(Node x, TKey newKey)
@@ -202,14 +202,14 @@ namespace CSharpLibraries.Algorithms.Structures
                 }
             }
 
-            if (_keyComparer(x.Key, RootList.Key) <= 0) RootList = x;
+            if (_keyComparer(x.Key, RootList!.Key) <= 0) RootList = x;
         }
 
         private void Cut(Node a, Node b)
         {
             RemoveNodeFromList(a);
             b.Degree--;
-            AddNodeToList(a, RootList);
+            AddNodeToList(a, RootList!);
             a.Mark = false;
         }
 
@@ -230,7 +230,7 @@ namespace CSharpLibraries.Algorithms.Structures
         // ReSharper disable once UnusedMember.Local
         private void Delete(Node x)
         {
-            DecreaseKey(x, RootList.Key);
+            DecreaseKey(x, RootList!.Key);
             ExtractMin();
         }
 

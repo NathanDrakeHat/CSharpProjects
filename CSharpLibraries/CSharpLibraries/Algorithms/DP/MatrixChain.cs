@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using static CSharpLibraries.Extensions.Extension;
 
@@ -13,15 +12,15 @@ namespace CSharpLibraries.Algorithms.DP
         public class MatrixChainResult
         {
             public int MinCost;
-            public Node Res;
+            internal Node? Res;
 
-            public class Node
+            internal class Node
             {
                 // arithmetic tree
                 // only leave store numbers
                 public readonly int Number; // a * b
-                public Node Left;
-                public Node Right;
+                public Node? Left;
+                public Node? Right;
 
                 // medium node without number
                 public Node()
@@ -66,7 +65,7 @@ namespace CSharpLibraries.Algorithms.DP
             public override string ToString()
             {
                 var t = new StringBuilder();
-                Walk(Res, t);
+                Walk(Res!, t);
                 return t.ToString();
             }
         }

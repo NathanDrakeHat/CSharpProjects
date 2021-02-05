@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using static CSharpLibraries.Extensions.Extension;
 
@@ -18,10 +17,10 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public sealed class BfsVertex<Tid>
         {
-            public BfsVertex<Tid> Parent { get; internal set; }
+            public BfsVertex<Tid>? Parent { get; internal set; }
             internal Color Color;
             public double Distance { get; internal set; } // d
-            public readonly Tid Id;
+            public readonly Tid? Id;
 
             public BfsVertex(Tid id)
             {
@@ -80,11 +79,11 @@ namespace CSharpLibraries.Algorithms.Graph
 
         private static void Traverse<T>(BfsVertex<T> s, BfsVertex<T> v, List<T> res)
         {
-            if (v == s) res.Add(s.Id);
+            if (v == s) res.Add(s.Id!);
             else if (v.Parent != null)
             {
                 Traverse(s, v.Parent, res);
-                res.Add(v.Id);
+                res.Add(v.Id!);
             }
         }
     }
