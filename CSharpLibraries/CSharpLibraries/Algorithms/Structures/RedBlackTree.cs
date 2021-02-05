@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using static CSharpLibraries.Extensions.Extension;
 
 [assembly: InternalsVisibleTo("CSharpLibrariesTest")]
 
@@ -71,10 +72,9 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="low">include</param>
         /// <param name="high">include</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">List of element in range</exception>
         public List<TKey> KeyRangeSearch(TKey low, TKey high)
         {
-            if (low == null || high == null) throw new ArgumentNullException();
+            NotNullArg(low, nameof(low));
             var res = new List<TKey>();
             if (!NotNullTree()) return res;
             KeyRangeSearch(Root, low, high, res);
@@ -221,10 +221,9 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="key"></param>
         /// <param name="val"></param>
-        /// <exception cref="ArgumentNullException">Key is null</exception>
         public void Insert(TKey key, TValue val)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            NotNullArg(key,nameof(key));
             var n = Search(Root, key);
             if (n != null)
             {
@@ -244,11 +243,10 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="key"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
         public TValue Search(TKey key)
         {
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            NotNullArg(key,nameof(key));
             var res = Search(Root, key);
             if (res == null) throw new InvalidOperationException("No suck key.");
             else return res.Value;
@@ -261,11 +259,10 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="key"></param>
         /// <param name="newValue"></param>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         public void Set(TKey key, TValue newValue)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            NotNullArg(key,nameof(key));
             var node = Search(Root, key);
             if (node == null) throw new InvalidOperationException("No such key.");
             node.Value = newValue;
@@ -276,11 +273,10 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="key"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
         public void Delete(TKey key)
         {
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            NotNullArg(key,nameof(key));
             var node = Search(Root, key);
             if (node == null) return;
             Delete(node);

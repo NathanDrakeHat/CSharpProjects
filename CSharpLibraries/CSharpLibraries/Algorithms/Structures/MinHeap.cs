@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Structures
 {
@@ -39,11 +40,11 @@ namespace CSharpLibraries.Algorithms.Structures
         public MinHeap(IEnumerable<TValue> values, Func<TValue, TKey> getKey, Func<TKey, TKey, int> keyComparer)
         {
             _keyComparer = keyComparer ?? throw new ArgumentNullException(nameof(keyComparer));
-            if (values == null) throw new ArgumentNullException(nameof(values));
-            if (getKey == null) throw new ArgumentNullException(nameof(getKey));
+            NotNullArg(values,nameof(values));
+            NotNullArg(getKey,nameof(getKey));
             foreach (var i in values)
             {
-                if (i == null) throw new ArgumentNullException(nameof(values));
+                if (i == null) throw new ArgumentException("null in container", nameof(values));
                 if (_valueToNodeMap.ContainsKey(i)) throw new ArgumentException("duplicate value", nameof(values));
                 var n = new Node(getKey(i), i, HeapSize);
                 _array.Add(n);
@@ -66,9 +67,9 @@ namespace CSharpLibraries.Algorithms.Structures
 
         public void UpdateKey(TValue value, TKey newKey)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (newKey == null) throw new ArgumentNullException(nameof(newKey));
-            var node = _valueToNodeMap[value];
+            NotNullArg(value,nameof(value));
+            NotNullArg(newKey,nameof(newKey));
+            var node = _valueToNodeMap[value!];
             if (node == null) throw new InvalidOperationException("No such value.");
             if (_keyComparer(newKey, node.Key) < 0)
             {
@@ -102,9 +103,9 @@ namespace CSharpLibraries.Algorithms.Structures
 
         public void Add(TKey key, TValue value)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            if (_valueToNodeMap.ContainsKey(value)) throw new ArgumentException("duplicate value", nameof(value));
+            NotNullArg(key,nameof(key));
+            NotNullArg(value,nameof(value));
+            if (_valueToNodeMap.ContainsKey(value!)) throw new ArgumentException("duplicate value", nameof(value));
             
             var n = new Node(key, value, HeapSize);
             _array.Add(n);

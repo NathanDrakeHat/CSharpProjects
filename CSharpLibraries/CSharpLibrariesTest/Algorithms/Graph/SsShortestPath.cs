@@ -111,7 +111,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     [Test]
     public static void AlgorithmDijkstraTestWithFibonacciHeap() {
         var g = BuildDijkstraCase();
-        SsShortestPath.Dijkstra(g, _targetDijkstraCase, SsShortestPath.Heap.MinHeap);
+        SsShortestPath.DijkstraFibonacciHeap(g, _targetDijkstraCase);
         var vertices = g.AllVertices().ToList();
         vertices.Sort(Comparer<Bfs.BfsVertex<string>>.Create(((a, b) => String.Compare(a.Id, b.Id, StringComparison.Ordinal))));
         Assert.IsNull(vertices[0].Parent);
@@ -132,7 +132,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     [Test]
     public static void AlgorithmDijkstraTestWithMinHeap() {
         var g = BuildDijkstraCase();
-        SsShortestPath.Dijkstra(g, _targetDijkstraCase, SsShortestPath.Heap.Fibonacci);
+        SsShortestPath.DijkstraMinHeap(g, _targetDijkstraCase);
         var vertices = g.AllVertices().ToList();
         vertices.Sort(Comparer<Bfs.BfsVertex<string>>.Create(((a, b) => String.Compare(a.Id, b.Id, StringComparison.Ordinal))));
         Assert.IsNull(vertices[0].Parent);

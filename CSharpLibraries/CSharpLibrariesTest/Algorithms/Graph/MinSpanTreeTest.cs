@@ -59,7 +59,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
 
         static void RunFibonacciHeap(LinkedGraph<MinSpanTree.PrimVertex<string>> graph)
         {
-            MinSpanTree.AlgorithmOfPrimWithFibonacciHeap(graph, _targetPrimA);
+            MinSpanTree.PrimFibonacciHeap(graph, _targetPrimA);
             var vertices = graph.AllVertices();
             var res = new HashSet<HashSet<string>>();
             foreach (var vertex in vertices)
@@ -76,7 +76,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
 
         static void RunMinHeap(LinkedGraph<MinSpanTree.PrimVertex<string>> graph)
         {
-            MinSpanTree.AlgorithmOfPrimWithMinHeap(graph, _targetPrimA);
+            MinSpanTree.PrimMinHeap(graph, _targetPrimA);
             var vertices = graph.AllVertices();
             var res = new HashSet<HashSet<string>>();
             foreach (var vertex in vertices)

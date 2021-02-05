@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using static CSharpLibraries.Extensions.Extension;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 namespace CSharpLibraries.Algorithms.Structures
@@ -41,13 +42,11 @@ namespace CSharpLibraries.Algorithms.Structures
         public int Count { get; internal set; } // number of nodes
         private readonly Dictionary<TValue, Node> _valueToNodeMap = new Dictionary<TValue, Node>();
         private readonly Func<TKey, TKey, int> _keyComparer;
-        private readonly bool _keyIsClass;
         private int UpperBound => (int) (Math.Log(Count) / Math.Log(2));
 
         public FibonacciHeap(Func<TKey, TKey, int> keyComparer)
         {
             _keyComparer = keyComparer ?? throw new ArgumentNullException(nameof(keyComparer));
-            _keyIsClass = typeof(TKey).IsClass;
         }
 
         private void Insert(Node x)
@@ -150,7 +149,7 @@ namespace CSharpLibraries.Algorithms.Structures
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public FibonacciHeap<TKey, TValue> Union(FibonacciHeap<TKey, TValue> f2)
         {
-            if (f2 == null) throw new ArgumentNullException(nameof(f2));
+            NotNullArg(f2,nameof(f2));
             var res = new FibonacciHeap<TKey, TValue>(_keyComparer) {RootList = RootList};
             var f1Right = RootList.Right; // concatenate two root list
             var f2Left = f2.RootList.Left;
@@ -169,7 +168,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public void DecreaseKey(TValue val, TKey newKey)
         {
             var x = _valueToNodeMap[val];
-            if (_keyIsClass && newKey == null) throw new ArgumentNullException(nameof(newKey));
+            NotNullArg(newKey,nameof(newKey));
             if (_keyComparer(newKey, x.Key) > 0)
                 throw new InvalidOperationException(
                     "New key should smaller than original key");

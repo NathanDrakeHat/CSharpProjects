@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
+using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
@@ -58,11 +59,11 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public LinkedGraph(IEnumerable<TVertex> vertices, GraphDirection isDirected)
         {
-            if (vertices == null) throw new ArgumentNullException(nameof(vertices));
+            NotNullArg(vertices, nameof(vertices));
             Size = 0;
             foreach (var vertex in vertices)
             {
-                if (vertex == null) throw new ArgumentNullException(nameof(vertices));
+                if (vertex == null) throw new ArgumentException("null element in container",nameof(vertices));
                 _edgesMap[vertex] = new List<Edge>();
                 _vertices.Add(vertex);
                 Size++;
@@ -73,7 +74,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public LinkedGraph(LinkedGraph<TVertex> otherGraph)
         {
-            if (otherGraph == null) throw new ArgumentNullException(nameof(otherGraph));
+            NotNullArg(otherGraph,nameof(otherGraph));
             Size = otherGraph._vertices.Count;
             _graphGraphDirection = otherGraph._graphGraphDirection;
             _vertices.AddRange(otherGraph._vertices);

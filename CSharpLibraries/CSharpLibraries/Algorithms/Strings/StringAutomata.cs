@@ -61,14 +61,14 @@ namespace CSharpLibraries.Algorithms.Strings
             return map;
         }
 
-        public static List<int> FiniteAutomationMatcher(string T, Dictionary<TransitionEntry, int> delta, int m)
+        public static List<int> FiniteAutomationMatcher(string t, Dictionary<TransitionEntry, int> delta, int m)
         {
             List<int> res = new List<int>();
-            int n = T.Length;
+            int n = t.Length;
             int q = 0;
             for (int i = 0; i < n; i++)
             {
-                q = delta[new TransitionEntry(q, T[i])];
+                q = delta[new TransitionEntry(q, t[i])];
                 if (q == m)
                 {
                     res.Add(i - m);

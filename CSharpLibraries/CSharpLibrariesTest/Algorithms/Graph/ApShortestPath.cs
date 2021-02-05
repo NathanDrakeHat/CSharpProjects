@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CSharpLibraries.Algorithms.Graph;
 using NUnit.Framework;
+using static CSharpLibraries.Algorithms.Graph.SsShortestPath;
 
 namespace CSharpLibrariesTest.Algorithms.Graph
 {
@@ -98,7 +99,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
         [Test]
         public static void AlgorithmJohnsonTest()
         {
-            var res = ApShortestPath.Johnson(Build(), SsShortestPath.Heap.Fibonacci);
+            var res = ApShortestPath.Johnson(Build(), DijkstraFibonacciHeap);
             var answer = new[,]
             {
                 {0.0, 1.0, -3.0, 2.0, -4.0},
@@ -109,7 +110,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
             };
             Assert.AreEqual(answer, res);
 
-            res = ApShortestPath.Johnson(Build(), SsShortestPath.Heap.MinHeap);
+            res = ApShortestPath.Johnson(Build(), DijkstraMinHeap);
             Assert.AreEqual(answer, res);
         }
 

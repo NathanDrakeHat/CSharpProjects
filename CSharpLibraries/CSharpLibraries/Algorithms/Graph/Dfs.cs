@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
+using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
@@ -33,7 +34,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static void DepthFirstSearch<T>(LinkedGraph<DfsVertex<T>> graph)
         {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(graph,nameof(graph));
             var vertices = graph.AllVertices();
             foreach (var v in vertices)
             {
@@ -72,7 +73,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static List<DfsVertex<T>> TopologicalSort<T>(LinkedGraph<DfsVertex<T>> graph)
         {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(graph,nameof(graph));
             DepthFirstSearch(graph);
             var l = new List<DfsVertex<T>>(graph.AllVertices());
             l.Sort(Comparer<DfsVertex<T>>.Create(((a, b) => b.Finish - a.Finish))); // descend order
@@ -81,7 +82,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static void StronglyConnectedComponents<T>(LinkedGraph<DfsVertex<T>> graph)
         {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(graph,nameof(graph));
             var l = TopologicalSort(graph);
             var gT = TransposeGraph(graph);
             DepthFirstSearchOrderly(gT, l);

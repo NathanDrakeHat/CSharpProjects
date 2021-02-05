@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
@@ -90,14 +91,13 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static bool[,] TransitiveClosure(double[][] weight)
         {
-            if (weight == null) throw new ArgumentNullException(nameof(weight));
             var n = weight.Length;
-            var T = new bool[n, n];
+            var t = new bool[n, n];
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
-                    T[i, j] = (i == j) || !weight[i][j].Equals(double.PositiveInfinity);
+                    t[i, j] = (i == j) || !weight[i][j].Equals(double.PositiveInfinity);
                 }
             }
 
@@ -108,14 +108,14 @@ namespace CSharpLibraries.Algorithms.Graph
                 {
                     for (int j = 0; j < n; j++)
                     {
-                        tK[i, j] = T[i, j] || (T[i, k] && T[k, j]);
+                        tK[i, j] = t[i, j] || (t[i, k] && t[k, j]);
                     }
                 }
 
-                T = tK;
+                t = tK;
             }
 
-            return T;
+            return t;
         }
 
 
@@ -125,14 +125,12 @@ namespace CSharpLibraries.Algorithms.Graph
         /// <br/>Min heap: O(V*E*lgV)
         /// </summary>
         /// <param name="graph"></param>
-        /// <param name="type"></param>
+        /// <param name="dijkstra"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public static double[,] Johnson<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, SsShortestPath.Heap type)
+        public static double[,] Johnson<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Action<LinkedGraph<Bfs.BfsVertex<T>>, Bfs.BfsVertex<T>> dijkstra)
         {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
             var h = new Dictionary<Bfs.BfsVertex<T>, double>();
             var n = graph.Size;
             var verticesNew = graph.AllVertices();
@@ -163,14 +161,11 @@ namespace CSharpLibraries.Algorithms.Graph
                     if (u != s)
                     {
                         int idxV = 0;
-                        SsShortestPath.Dijkstra(graph, u, type);
-                        foreach (var v in verticesNew)
+                        dijkstra(graph, u);
+                        foreach (var v in verticesNew.Where(v => v != s))
                         {
-                            if (v != s)
-                            {
-                                d[idxU, idxV] = v.Distance + h[v] - h[u];
-                                idxV++;
-                            }
+                            d[idxU, idxV] = v.Distance + h[v] - h[u];
+                            idxV++;
                         }
 
                         idxU++;

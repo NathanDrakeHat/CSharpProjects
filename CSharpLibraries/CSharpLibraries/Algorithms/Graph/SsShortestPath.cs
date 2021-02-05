@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpLibraries.Algorithms.Structures;
+using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
@@ -14,8 +15,8 @@ namespace CSharpLibraries.Algorithms.Graph
         // general case algorithm: negative weight, cyclic
         public static bool BellmanFord<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(s,nameof(s));
+            NotNullArg(graph,nameof(graph));
             InitializeSingleSource(graph, s);
             int verticesCount = graph.Size;
             var edges = graph.AllEdges();
@@ -66,9 +67,9 @@ namespace CSharpLibraries.Algorithms.Graph
             LinkedGraph<Dfs.DfsVertex<Bfs.BfsVertex<T>>> dfsLinkedGraph,
             LinkedGraph<Bfs.BfsVertex<T>> bfsLinkedGraph, Bfs.BfsVertex<T> s)
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            if (dfsLinkedGraph == null) throw new ArgumentNullException(nameof(dfsLinkedGraph));
-            if (bfsLinkedGraph == null) throw new ArgumentNullException(nameof(bfsLinkedGraph));
+            NotNullArg(s,nameof(s));
+            NotNullArg(dfsLinkedGraph,nameof(dfsLinkedGraph));
+            NotNullArg(bfsLinkedGraph,nameof(bfsLinkedGraph));
             var dfsList = Dfs.TopologicalSort(dfsLinkedGraph);
             InitializeSingleSource(bfsLinkedGraph, s);
             dfsList.Sort(Comparer<Dfs.DfsVertex<Bfs.BfsVertex<T>>>.Create(
@@ -83,25 +84,10 @@ namespace CSharpLibraries.Algorithms.Graph
             return bfsLinkedGraph;
         }
 
-
-        // TODO remove this
-        // non-negative weight,
-        public enum Heap
-        {
-            Fibonacci,
-            MinHeap
-        }
-
-        public static void Dijkstra<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s, Heap type)
-        {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
-            if (type == Heap.Fibonacci) DijkstraFibonacciHeap(graph, s);
-            else DijkstraMinHeap(graph, s);
-        }
-
+        
+        // non-negative weight
         // fibonacci heap, time complexity: O(V^2*lgV + V*E)
-        private static void DijkstraFibonacciHeap<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
+        public static void DijkstraFibonacciHeap<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
         {
             InitializeSingleSource(graph, s);
             var vertices = graph.AllVertices();
@@ -123,7 +109,7 @@ namespace CSharpLibraries.Algorithms.Graph
         }
 
         // min heap, time complexity: O(V*E*lgV)
-        private static void DijkstraMinHeap<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
+        public static void DijkstraMinHeap<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
         {
             InitializeSingleSource(graph, s);
             var vertices = graph.AllVertices();

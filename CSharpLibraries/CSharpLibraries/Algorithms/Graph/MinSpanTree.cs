@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CSharpLibraries.Algorithms.Structures;
+using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
@@ -31,7 +32,7 @@ namespace CSharpLibraries.Algorithms.Graph
         public static HashSet<LinkedGraph<KruskalVertex<T>>.Edge> AlgorithmOfKruskal<T>(
             LinkedGraph<KruskalVertex<T>> graph)
         {
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+           NotNullArg(graph,nameof(graph));
             var res = new HashSet<LinkedGraph<KruskalVertex<T>>.Edge>();
             var edgesSet = graph.AllEdges();
             var edgesList = edgesSet.ToList();
@@ -70,10 +71,10 @@ namespace CSharpLibraries.Algorithms.Graph
 
         #endregion
 
-        public static void AlgorithmOfPrimWithFibonacciHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
+        public static void PrimFibonacciHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(r,nameof(r));
+            NotNullArg(graph,nameof(graph));
             var priorityQueue = new FibonacciHeap<double, PrimVertex<T>>((a, b) => a - b > 0 ? 1 : a - b < 0 ? -1 : 0);
             var vertices = graph.AllVertices();
             foreach (var u in vertices)
@@ -100,10 +101,10 @@ namespace CSharpLibraries.Algorithms.Graph
             }
         }
 
-        public static void AlgorithmOfPrimWithMinHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
+        public static void PrimMinHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
         {
-            if (r == null) throw new ArgumentNullException(nameof(r));
-            if (graph == null) throw new ArgumentNullException(nameof(graph));
+            NotNullArg(r,nameof(r));
+            NotNullArg(graph,nameof(graph));
             var vertices = graph.AllVertices();
             foreach (var u in vertices)
             {
