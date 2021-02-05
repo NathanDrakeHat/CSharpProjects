@@ -1,4 +1,5 @@
-﻿namespace CSharpLibraries.Leetcode
+﻿#nullable disable
+namespace CSharpLibraries.Leetcode
 {
     public static class Leetcode400
     {

@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +37,7 @@ namespace CSharpLibraries.Extensions
         /// <param name="start">start string builder</param>
         /// <typeparam name="T">element to print</typeparam>
         /// <returns>nested list with '[' and ']' split</returns>
-        public static string NestedToString<T>(this IEnumerable nl, StringBuilder start = null)
+        public static string NestedToString<T>(this IEnumerable nl, StringBuilder? start = null)
         {
             StringBuilder res = new StringBuilder("[");
             var enumerator = nl.GetEnumerator();

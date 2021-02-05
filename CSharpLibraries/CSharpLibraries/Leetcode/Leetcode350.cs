@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable disable
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CSharpLibraries.Leetcode
@@ -26,7 +27,7 @@ namespace CSharpLibraries.Leetcode
             }
             ListNode oddTailPtr = head, evenTailPtr = head.next;
 
-            if (evenTailPtr?.next == null)
+            if (evenTailPtr.next == null)
             {
                 return head;
             }

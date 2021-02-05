@@ -1,8 +1,9 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpScripts.Demos
+namespace CSharpLibraries.Demos
 {
     public static class Scheme
     {

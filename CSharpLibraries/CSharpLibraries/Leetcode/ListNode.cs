@@ -1,4 +1,5 @@
-﻿// ReSharper disable InconsistentNaming
+﻿#nullable disable
+// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
 // ReSharper disable ClassNeverInstantiated.Global

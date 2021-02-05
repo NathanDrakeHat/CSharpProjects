@@ -43,18 +43,18 @@
         /// <br/>A[0] &lt; A[1] &lt; ... A[i-1] &lt; A[i]
         /// <br/>A[i] &gt; A[i+1] &gt; ... &gt; A[A.length - 1]
         /// </summary>
-        /// <param name="A"></param>
+        /// <param name="a"></param>
         /// <returns></returns>
-        public static bool ValidMountainArray(int[] A) {
-            if (A.Length < 3)
+        public static bool ValidMountainArray(int[] a) {
+            if (a.Length < 3)
             {
                 return false;
             }
 
-            int length = A.Length;
+            int length = a.Length;
             int i = 0;
 
-            while (i + 1 < length && A[i] < A[i + 1]) {
+            while (i + 1 < length && a[i] < a[i + 1]) {
                 i++;
             }
 
@@ -62,7 +62,7 @@
                 return false;
             }
 
-            while (i + 1 < length && A[i] > A[i + 1]) {
+            while (i + 1 < length && a[i] > a[i + 1]) {
                 i++;
             }
 
