@@ -25,7 +25,6 @@ namespace CSharpLibrariesTest.Algorithms.Miscellaneous
             });
         }
         
-        // TODO add all sort test
         [Test]
         public static void RecursiveMergeSortTest()
         {
