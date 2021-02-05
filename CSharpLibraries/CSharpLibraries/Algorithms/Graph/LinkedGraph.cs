@@ -80,7 +80,7 @@ namespace CSharpLibraries.Algorithms.Graph
             _vertices.AddRange(otherGraph._vertices);
             AddTo(otherGraph._edgesMap, _edgesMap);
 
-            static void AddTo<TK, TV>(Dictionary<TK, TV> dictionary1, Dictionary<TK, TV> dictionary2)
+            static void AddTo<Tk, Tv>(Dictionary<Tk, Tv> dictionary1, Dictionary<Tk, Tv> dictionary2)
             {
                 foreach (var entry in dictionary1)
                     dictionary2[entry.Key] = entry.Value;

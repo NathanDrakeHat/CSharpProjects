@@ -5,7 +5,7 @@ using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Structures
 {
-    public sealed class MinHeap<TKey, TValue> : IEnumerable<TValue>
+    public sealed class MinHeap<TKey, TValue> : IEnumerable<TValue> where TValue : notnull
     {
         #region InnerClass
 

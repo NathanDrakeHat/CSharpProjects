@@ -143,9 +143,9 @@ namespace CSharpLibraries.Extensions
             }
         }
 
-        public static void NotNullArg(object o, string name)
+        public static void NotNullArg(object? _, string name)
         {
-            if (o == null) throw new ArgumentNullException(name);
+            if (_ == null) throw new ArgumentNullException(name);
         }
 
         public static IList<int> ShuffledArithmeticSequence(int low, int high, int d)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable disable
+using System.Collections.Generic;
 using System.Linq;
 using static CSharpLibraries.Extensions.Extension;
 
@@ -70,9 +71,9 @@ namespace CSharpLibraries.Algorithms.Graph
         {
             NotNullArg(s,nameof(s));
             NotNullArg(v,nameof(v));
-            List<T> t = new List<T>();
+            List<T> t = new();
             Traverse(s, v, t);
-            List<T> res = new List<T>(t.Count);
+            List<T> res = new(t.Count);
             res.AddRange(t);
             return res;
         }
