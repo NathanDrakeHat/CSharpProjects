@@ -34,7 +34,7 @@ namespace CSharpLibraries.Algorithms.Graph
             {
                 if (vertex.Equals(FormerVertex)) return LaterVertex;
                 else if (vertex.Equals(LaterVertex)) return FormerVertex;
-                else throw new ArgumentException("Arg vertex not in this edge.");
+                else throw new ArgumentException("Arg vertex not in this edge.", nameof(vertex));
             }
 
             public override string ToString()
@@ -59,11 +59,11 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public LinkedGraph(IEnumerable<TVertex> vertices, GraphDirection isDirected)
         {
-            NotNullArg(vertices, nameof(vertices));
+            vertices.RequireNotNullArg(nameof(vertices));
             Size = 0;
             foreach (var vertex in vertices)
             {
-                if (vertex == null) throw new ArgumentException("null element in container",nameof(vertices));
+                vertex.RequireNotNull("null element in container",nameof(vertices));
                 _edgesMap[vertex] = new List<Edge>();
                 _vertices.Add(vertex);
                 Size++;
@@ -74,7 +74,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public LinkedGraph(LinkedGraph<TVertex> otherGraph)
         {
-            NotNullArg(otherGraph,nameof(otherGraph));
+            otherGraph.RequireNotNullArg(nameof(otherGraph));
             Size = otherGraph._vertices.Count;
             _graphGraphDirection = otherGraph._graphGraphDirection;
             _vertices.AddRange(otherGraph._vertices);

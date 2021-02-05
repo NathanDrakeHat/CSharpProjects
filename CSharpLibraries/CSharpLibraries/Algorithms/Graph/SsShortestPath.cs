@@ -14,8 +14,8 @@ namespace CSharpLibraries.Algorithms.Graph
         // general case algorithm: negative weight, cyclic
         public static bool BellmanFord<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Bfs.BfsVertex<T> s)
         {
-            NotNullArg(s,nameof(s));
-            NotNullArg(graph,nameof(graph));
+            s.RequireNotNullArg(nameof(s));
+            graph.RequireNotNullArg(nameof(graph));
             InitializeSingleSource(graph, s);
             int verticesCount = graph.Size;
             var edges = graph.AllEdges();
@@ -66,9 +66,9 @@ namespace CSharpLibraries.Algorithms.Graph
             LinkedGraph<Dfs.DfsVertex<Bfs.BfsVertex<T>>> dfsLinkedGraph,
             LinkedGraph<Bfs.BfsVertex<T>> bfsLinkedGraph, Bfs.BfsVertex<T> s)
         {
-            NotNullArg(s,nameof(s));
-            NotNullArg(dfsLinkedGraph,nameof(dfsLinkedGraph));
-            NotNullArg(bfsLinkedGraph,nameof(bfsLinkedGraph));
+            s.RequireNotNullArg(nameof(s));
+            dfsLinkedGraph.RequireNotNullArg(nameof(dfsLinkedGraph));
+            bfsLinkedGraph.RequireNotNullArg(nameof(bfsLinkedGraph));
             var dfsList = Dfs.TopologicalSort(dfsLinkedGraph);
             InitializeSingleSource(bfsLinkedGraph, s);
             dfsList.Sort(Comparer<Dfs.DfsVertex<Bfs.BfsVertex<T>>>.Create(

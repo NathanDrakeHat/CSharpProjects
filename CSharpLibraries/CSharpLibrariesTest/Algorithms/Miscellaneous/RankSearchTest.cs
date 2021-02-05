@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CSharpLibraries.Algorithms.Miscellaneous;
+using CSharpLibraries.Extensions;
 using NUnit.Framework;
 using static CSharpLibraries.Extensions.Extension;
 using static CSharpLibraries.Algorithms.Miscellaneous.RankSearch;

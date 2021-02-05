@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace CSharpLibraries.Algorithms.Miscellaneous
+namespace CSharpLibraries.Extensions
 {
     public class Enumeration : IEnumerable<int>
     {

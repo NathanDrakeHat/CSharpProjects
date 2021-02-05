@@ -25,7 +25,7 @@ namespace CSharpLibraries.Algorithms.Graph
 
             public BfsVertex(Tid id)
             {
-                NotNullArg(id, nameof(id));
+                id.RequireNotNullArg(nameof(id));
                 Id = id;
             }
 
@@ -36,8 +36,8 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static void BreathFirstSearch<T>(LinkedGraph<BfsVertex<T>> g, BfsVertex<T> s)
         {
-            NotNullArg(g, nameof(g));
-            NotNullArg(g,nameof(s));
+            g.RequireNotNullArg(nameof(g));
+            s.RequireNotNullArg(nameof(s));
             var vs = g.AllVertices();
             foreach (var v in vs.Where(v => v != s))
             {
@@ -69,8 +69,8 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static IList<T> GetPath<T>(BfsVertex<T> s, BfsVertex<T> v)
         {
-            NotNullArg(s,nameof(s));
-            NotNullArg(v,nameof(v));
+            s.RequireNotNullArg(nameof(s));
+            v.RequireNotNullArg(nameof(v));
             List<T> t = new();
             Traverse(s, v, t);
             List<T> res = new(t.Count);

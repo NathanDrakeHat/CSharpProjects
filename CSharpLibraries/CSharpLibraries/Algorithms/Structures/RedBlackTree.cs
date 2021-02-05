@@ -74,7 +74,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <returns></returns>
         public List<TKey> KeyRangeSearch(TKey low, TKey high)
         {
-            NotNullArg(low, nameof(low));
+            low.RequireNotNullArg(nameof(low));
             var res = new List<TKey>();
             if (!NotNullTree()) return res;
             KeyRangeSearch(Root, low, high, res);
@@ -223,7 +223,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="val"></param>
         public void Insert(TKey key, TValue val)
         {
-            NotNullArg(key,nameof(key));
+            key.RequireNotNullArg(nameof(key));
             var n = Search(Root, key);
             if (n != null)
             {
@@ -246,7 +246,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public TValue Search(TKey key)
         {
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
-            NotNullArg(key,nameof(key));
+            key.RequireNotNullArg(nameof(key));
             var res = Search(Root, key);
             if (res == null) throw new InvalidOperationException("No suck key.");
             else return res.Value;
@@ -262,7 +262,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <exception cref="InvalidOperationException"></exception>
         public void Set(TKey key, TValue newValue)
         {
-            NotNullArg(key,nameof(key));
+            key.RequireNotNullArg(nameof(key));
             var node = Search(Root, key);
             if (node == null) throw new InvalidOperationException("No such key.");
             node.Value = newValue;
@@ -276,7 +276,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public void Delete(TKey key)
         {
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
-            NotNullArg(key,nameof(key));
+            key.RequireNotNullArg(nameof(key));
             var node = Search(Root, key);
             if (node == null) return;
             Delete(node);

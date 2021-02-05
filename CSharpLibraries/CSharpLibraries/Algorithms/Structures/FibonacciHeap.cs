@@ -149,7 +149,7 @@ namespace CSharpLibraries.Algorithms.Structures
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public FibonacciHeap<TKey, TValue> Union(FibonacciHeap<TKey, TValue> f2)
         {
-            NotNullArg(f2,nameof(f2));
+            f2.RequireNotNullArg(nameof(f2));
             var res = new FibonacciHeap<TKey, TValue>(_keyComparer) {RootList = RootList};
             var f1Right = RootList!.Right; // concatenate two root list
             var f2Left = f2.RootList!.Left;
@@ -168,7 +168,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public void DecreaseKey(TValue val, TKey newKey)
         {
             var x = _valueToNodeMap[val];
-            NotNullArg(newKey,nameof(newKey));
+            newKey.RequireNotNullArg(nameof(newKey));
             if (_keyComparer(newKey, x.Key) > 0)
                 throw new InvalidOperationException(
                     "New key should smaller than original key");

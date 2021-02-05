@@ -40,8 +40,8 @@ namespace CSharpLibraries.Algorithms.Structures
         public MinHeap(IEnumerable<TValue> values, Func<TValue, TKey> getKey, Func<TKey, TKey, int> keyComparer)
         {
             _keyComparer = keyComparer ?? throw new ArgumentNullException(nameof(keyComparer));
-            NotNullArg(values,nameof(values));
-            NotNullArg(getKey,nameof(getKey));
+            values.RequireNotNullArg(nameof(values));
+            getKey.RequireNotNullArg(nameof(getKey));
             foreach (var i in values)
             {
                 if (i == null) throw new ArgumentException("null in container", nameof(values));
@@ -67,8 +67,8 @@ namespace CSharpLibraries.Algorithms.Structures
 
         public void UpdateKey(TValue value, TKey newKey)
         {
-            NotNullArg(value,nameof(value));
-            NotNullArg(newKey,nameof(newKey));
+            value.RequireNotNullArg(nameof(value));
+            newKey.RequireNotNullArg(nameof(newKey));
             var node = _valueToNodeMap[value!];
             if (node == null) throw new InvalidOperationException("No such value.");
             if (_keyComparer(newKey, node.Key) < 0)
@@ -103,8 +103,8 @@ namespace CSharpLibraries.Algorithms.Structures
 
         public void Add(TKey key, TValue value)
         {
-            NotNullArg(key,nameof(key));
-            NotNullArg(value,nameof(value));
+            key.RequireNotNullArg(nameof(key));
+            value.RequireNotNullArg(nameof(value));
             if (_valueToNodeMap.ContainsKey(value!)) throw new ArgumentException("duplicate value", nameof(value));
             
             var n = new Node(key, value, HeapSize);

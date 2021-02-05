@@ -32,7 +32,7 @@ namespace CSharpLibraries.Algorithms.Graph
         public static HashSet<LinkedGraph<KruskalVertex<T>>.Edge> AlgorithmOfKruskal<T>(
             LinkedGraph<KruskalVertex<T>> graph)
         {
-           NotNullArg(graph,nameof(graph));
+           graph.RequireNotNullArg(nameof(graph));
             var res = new HashSet<LinkedGraph<KruskalVertex<T>>.Edge>();
             var edgesSet = graph.AllEdges();
             var edgesList = edgesSet.ToList();
@@ -73,8 +73,8 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static void PrimFibonacciHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
         {
-            NotNullArg(r,nameof(r));
-            NotNullArg(graph,nameof(graph));
+            r.RequireNotNullArg(nameof(r));
+            graph.RequireNotNullArg(nameof(graph));
             var priorityQueue = new FibonacciHeap<double, PrimVertex<T>>((a, b) => a - b > 0 ? 1 : a - b < 0 ? -1 : 0);
             var vertices = graph.AllVertices();
             foreach (var u in vertices)
@@ -103,8 +103,8 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public static void PrimMinHeap<T>(LinkedGraph<PrimVertex<T>> graph, PrimVertex<T> r)
         {
-            NotNullArg(r,nameof(r));
-            NotNullArg(graph,nameof(graph));
+            r.RequireNotNullArg(nameof(r));
+            graph.RequireNotNullArg(nameof(graph));
             var vertices = graph.AllVertices();
             foreach (var u in vertices)
             {
