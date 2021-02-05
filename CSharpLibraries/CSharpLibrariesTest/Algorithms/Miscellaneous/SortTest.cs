@@ -12,12 +12,12 @@ namespace CSharpLibrariesTest.Algorithms.Miscellaneous
     {
         private static bool IsAscending<T>(IList<T> l) where T : IComparable<T>
         {
-            return new Enumeration(0, l.Count - 1).AsParallel().All(i => l[i].CompareTo(l[i + 1]) <= 0);
+            return new Enumeration(0, l.Count - 1).All(i => l[i].CompareTo(l[i + 1]) <= 0);
         }
 
         private static bool IsAscending(IList<RawDate> l)
         {
-            return new Enumeration(0, l.Count - 1).AsParallel().All(i =>
+            return new Enumeration(0, l.Count - 1).All(i =>
             {
                 var former = l[i];
                 var later = l[i + 1];
