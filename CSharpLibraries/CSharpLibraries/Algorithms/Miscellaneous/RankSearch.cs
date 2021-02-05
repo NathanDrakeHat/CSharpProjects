@@ -18,7 +18,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             {
                 while (true)
                 {
-                    if ((start - end) == 1)
+                    if (start - end == 1)
                     {
                         return a[start];
                     }
