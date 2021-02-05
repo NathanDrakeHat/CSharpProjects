@@ -1,11 +1,12 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using static CSharpLibraries.Extensions.Extension;
 
 namespace CSharpLibraries.Algorithms.Structures
 {
-    public sealed class MinHeap<TKey, TValue> : IEnumerable<TValue> where TValue : notnull
+    public sealed class MinHeap<TKey, TValue> : IEnumerable<TValue>
     {
         #region InnerClass
 
@@ -106,7 +107,7 @@ namespace CSharpLibraries.Algorithms.Structures
             key.RequireNotNullArg(nameof(key));
             value.RequireNotNullArg(nameof(value));
             if (_valueToNodeMap.ContainsKey(value!)) throw new ArgumentException("duplicate value", nameof(value));
-            
+
             var n = new Node(key, value, HeapSize);
             _array.Add(n);
             _valueToNodeMap[value] = n;

@@ -1,4 +1,5 @@
-﻿namespace CSharpLibraries.Algorithms.Structures
+﻿#nullable disable
+namespace CSharpLibraries.Algorithms.Structures
 {
     /// <summary>
     /// better insert implementation
