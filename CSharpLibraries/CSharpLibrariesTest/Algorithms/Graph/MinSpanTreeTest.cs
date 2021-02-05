@@ -8,10 +8,10 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     {
         [Test]
         // ReSharper disable once IdentifierTypo
-        public static void AlgorithmOfKruskalTest()
+        public static void KruskalTest()
         {
             var graph = BuildKruskalExample();
-            var t = MinSpanTree.AlgorithmOfKruskal(graph);
+            var t = MinSpanTree.Kruskal(graph);
             int i = 0;
             foreach (var e in t)
             {
@@ -47,7 +47,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
         }
 
         [Test]
-        public static void AlgorithmOfPrimTest()
+        public static void PrimTest()
         {
             var graph = BuildPrimExample();
             BuildPrimAnswer1();

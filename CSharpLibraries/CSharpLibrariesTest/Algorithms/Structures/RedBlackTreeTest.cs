@@ -38,10 +38,10 @@ namespace CSharpLibrariesTest.Algorithms.Structures
         public static void BalanceTest()
         {
             var t = new RedBlackTree<int, int>((a, b) => a - b);
-            for (int i = 0; i < 16383; i++) t.Insert(i, i);
-            Assert.True(t.GetHeight() == 13);
-            for (int i = 0; i < 8193; i++) t.Delete(i);
-            Assert.True(t.GetHeight() == 12);
+            for (int i = 0; i < 127; i++) t.Insert(i, i);
+            Assert.AreEqual(6,t.GetHeight());
+            for (int i = 0; i < 65; i++) t.Delete(i);
+            Assert.AreEqual(5,t.GetHeight());
         }
 
         [Test]

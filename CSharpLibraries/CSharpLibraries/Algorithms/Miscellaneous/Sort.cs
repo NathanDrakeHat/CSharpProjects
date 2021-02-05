@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace CSharpLibraries.Algorithms.Miscellaneous
 {
+    /// <summary>
+    /// In place sort
+    /// </summary>
     public static class Sort
     {
         public sealed class RawDate
@@ -21,11 +24,11 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             }
         }
 
-        public static void IterativeMergeSort<T>(this IList<T> list)
+        public static IList<T> IterativeMergeSort<T>(this IList<T> list)
             where T : IComparable<T>, new()
         {
             if (list == null) throw new ArgumentNullException();
-            if (list.Count <= 1) return;
+            if (list.Count <= 1) return list;
 
 
             int expTimes = (int) Math.Floor(Math.Log(list.Count) / Math.Log(2));
@@ -64,11 +67,14 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 var restCache2 = new T[list.Count - groupSize / 2];
                 Merge(list, 0, restCache1, restCache2);
             }
+
+            return list;
         }
 
-        public static void RecursiveMergeSort<T>(this IList<T> list) where T : IComparable<T>, new()
+        public static IList<T> RecursiveMergeSort<T>(this IList<T> list) where T : IComparable<T>, new()
         {
             Sort(list, 0, list.Count);
+            return list;
 
             #region InnerMethods
 
@@ -119,10 +125,10 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 ArrayCopy(cache2, rightIdx, array, start + leftIdx + rightIdx, cache2.Length - rightIdx);
         }
 
-        public static void QuickSort<T>(this IList<T> list) where T : IComparable<T>
+        public static IList<T> QuickSort<T>(this IList<T> list) where T : IComparable<T>
         {
             Sort(list, 0, list.Count);
-
+            return list;
             #region InnerMethods
 
             static void Sort(IList<T> list, int start, int end)
@@ -157,10 +163,10 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             #endregion
         }
 
-        public static void RandomQuickSort<T>(this IList<T> list) where T : IComparable<T>
+        public static IList<T> RandomQuickSort<T>(this IList<T> list) where T : IComparable<T>
         {
             Sort(list, 0, list.Count);
-
+            return list;
             #region InnerMethods
 
             static void Sort(IList<T> list, int start, int end)
@@ -201,7 +207,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             return i;
         }
 
-        public static void HeapSort<T>(this IList<T> list) where T : IComparable<T>
+        public static IList<T> HeapSort<T>(this IList<T> list) where T : IComparable<T>
         {
             BuildMaxHeap(list);
             int heapSize = list.Count;
@@ -213,6 +219,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 MaxHeapify(list, 0, --heapSize);
             }
 
+            return list;
             #region InnerMethods
 
             static void MaxHeapify(IList<T> arr, int idx, int heapSize)
@@ -262,7 +269,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         /// int mean distributed data only
         /// </summary>
         /// <param name="list"></param>
-        public static void CountingSort(this IList<int> list)
+        public static IList<int> CountingSort(this IList<int> list)
         {
             var b = new int[list.Count];
             int min = list[0], max = list[0];
@@ -298,40 +305,42 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             }
 
             ArrayCopy(b, 0, list, 0, b.Length);
+            return list;
         }
 
         /// <summary>
         /// mean distribution, input[0,1)
         /// </summary>
-        /// <param name="a"></param>
-        public static void BucketSort(this IList<double> a)
+        /// <param name="list"></param>
+        public static IList<double> BucketSort(this IList<double> list)
         {
             var b = new List<List<double>>();
-            int n = a.Count;
+            int n = list.Count;
             for (int i = 0; i < n; i++)
             {
                 b.Add(new List<double>());
             }
 
-            foreach (var ai in a)
+            foreach (var ai in list)
             {
                 b[(int) Math.Floor(n * ai)].Add(ai);
             }
 
             var resList = new List<double>();
-            foreach (var list in b)
+            foreach (var l in b)
             {
-                list.Sort();
-                resList.AddRange(list);
+                l.Sort();
+                resList.AddRange(l);
             }
 
             for (int i = 0; i < n; i++)
             {
-                a[i] = resList[i];
+                list[i] = resList[i];
             }
+            return list;
         }
 
-        public static void BucketSort(this IList<float> list)
+        public static IList<float> BucketSort(this IList<float> list)
         {
             var b = new List<List<float>>();
             int n = list.Count;
@@ -356,9 +365,10 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             {
                 list[i] = resList[i];
             }
+            return list;
         }
 
-        public static void BucketSort(this IList<decimal> list)
+        public static IList<decimal> BucketSort(this IList<decimal> list)
         {
             var b = new List<List<decimal>>();
             int n = list.Count;
@@ -383,21 +393,26 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             {
                 list[i] = resList[i];
             }
+            return list;
         }
 
         /// <summary>
         /// sort properties from smaller to bigger
         /// </summary>
         /// <param name="list"></param>
-        public static void RadixSort(this IList<RawDate> list)
+        public static IList<RawDate> RadixSort(this IList<RawDate> list)
         {
-            var t = list.OrderBy(d => d.Day).ThenBy(d => d.Month).ThenBy(d => d.Year);
+            var t = list.OrderBy(d=>d.Day).ToList().
+                OrderBy(d=>d.Month).ToList().
+                OrderBy(d=>d.Year).ToList();
             int i = 0;
             foreach (var date in t)
             {
                 list[i] = date;
                 i++;
             }
+
+            return list;
         }
     }
 }

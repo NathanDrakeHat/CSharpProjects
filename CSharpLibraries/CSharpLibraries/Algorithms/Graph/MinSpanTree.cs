@@ -29,7 +29,7 @@ namespace CSharpLibraries.Algorithms.Graph
         #endregion
 
         // ReSharper disable once IdentifierTypo
-        public static HashSet<LinkedGraph<KruskalVertex<T>>.Edge> AlgorithmOfKruskal<T>(
+        public static HashSet<LinkedGraph<KruskalVertex<T>>.Edge> Kruskal<T>(
             LinkedGraph<KruskalVertex<T>> graph)
         {
            graph.RequireNotNullArg(nameof(graph));

@@ -11,7 +11,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     public static class SsShortestPathTest {
 
     [Test]
-    public static void AlgorithmBellmanFordTest() {
+    public static void BellmanFordTest() {
         var graph = BuildBellmanFordCase();
         var b = SsShortestPath.BellmanFord(graph, _targetBellmanFordCaseS);
         Bfs.BfsVertex<string> target = _targetBellmanFordCaseZ;
@@ -109,7 +109,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     }
 
     [Test]
-    public static void AlgorithmDijkstraTestWithFibonacciHeap() {
+    public static void DijkstraFibonacciHeapTest() {
         var g = BuildDijkstraCase();
         SsShortestPath.DijkstraFibonacciHeap(g, _targetDijkstraCase);
         var vertices = g.AllVertices().ToList();
@@ -130,7 +130,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
     }
 
     [Test]
-    public static void AlgorithmDijkstraTestWithMinHeap() {
+    public static void DijkstraMinHeapTest() {
         var g = BuildDijkstraCase();
         SsShortestPath.DijkstraMinHeap(g, _targetDijkstraCase);
         var vertices = g.AllVertices().ToList();

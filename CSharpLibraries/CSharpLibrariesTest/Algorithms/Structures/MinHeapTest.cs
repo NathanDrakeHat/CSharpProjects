@@ -12,8 +12,8 @@ namespace CSharpLibrariesTest.Algorithms.Structures
         [Test]
         public static void RandomAddTest()
         {
-            for (int i = 0; i < 20; i++){
-                var l = ShuffledArithmeticSequence(1,128,2);
+            for (int i = 0; i < 10; i++){
+                var l = ShuffledArithmeticSequence(1,64,2);
                 var m = new MinHeap<int,string>((a,b)=>a-b);
                 foreach (var integer in l) {
                     m.Add(integer,integer.ToString());
@@ -39,7 +39,7 @@ namespace CSharpLibrariesTest.Algorithms.Structures
         public static void RandomUpdateKeyTest()
         {
             for (int i = 0; i < 10; i++) {
-                var l = ShuffledArithmeticSequence(1, 128,2);
+                var l = ShuffledArithmeticSequence(1, 64,2);
                 var rand = new Random();
                 var heap = new MinHeap<int, string>(
                     l.Select(e=>e.ToString()).ToList(),

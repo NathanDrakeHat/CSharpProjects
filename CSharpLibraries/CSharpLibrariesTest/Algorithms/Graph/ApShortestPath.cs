@@ -54,7 +54,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
 
         [Test]
         // ReSharper disable once IdentifierTypo
-        public static void AlgorithmFloydWarshallTest()
+        public static void FloydWarshallTest()
         {
             var res = ApShortestPath.FloydWarshall(new[]
             {
@@ -97,7 +97,7 @@ namespace CSharpLibrariesTest.Algorithms.Graph
         }
 
         [Test]
-        public static void AlgorithmJohnsonTest()
+        public static void JohnsonTest()
         {
             var res = ApShortestPath.Johnson(Build(), DijkstraFibonacciHeap);
             var answer = new[,]
