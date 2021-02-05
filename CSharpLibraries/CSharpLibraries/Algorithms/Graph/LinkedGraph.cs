@@ -63,7 +63,7 @@ namespace CSharpLibraries.Algorithms.Graph
             Size = 0;
             foreach (var vertex in vertices)
             {
-                vertex.RequireNotNull("null element in container",nameof(vertices));
+                if(vertex == null) throw new ArgumentException("null element in container",nameof(vertices));
                 _edgesMap[vertex] = new List<Edge>();
                 _vertices.Add(vertex);
                 Size++;

@@ -7,7 +7,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
 {
     public static class Sort
     {
-        public sealed class RawDate : IComparable<RawDate>
+        public sealed class RawDate
         {
             public readonly int Year;
             public readonly int Month;
@@ -18,26 +18,6 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 Year = y;
                 Month = m;
                 Day = d;
-            }
-
-            public int CompareTo(RawDate other)
-            {
-                return Year.CompareTo(other.Year) switch
-                {
-                    0 => Month.CompareTo(other.Month) switch
-                    {
-                        0 => Day.CompareTo(other.Day) switch
-                        {
-                            0 => 0,
-                            >0 => 1,
-                            <0 => -1
-                        },
-                        >0 => 1,
-                        <0 => -1
-                    },
-                    >0 => 1,
-                    <0 => -1
-                };
             }
         }
 

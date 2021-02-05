@@ -148,11 +148,6 @@ namespace CSharpLibraries.Extensions
             if (_ == null) throw new ArgumentNullException(name);
         }
 
-        public static void RequireNotNull(this object? _, string message, string name)
-        {
-            if (_ == null) throw new ArgumentException(message,name);
-        }
-
         public static IList<int> ShuffledArithmeticSequence(int low, int high, int d)
         {
             var l = new List<int>();
