@@ -18,10 +18,10 @@ namespace CSharpLibraries.Algorithms.Graph
 
         public sealed class BfsVertex<Tid>
         {
-            public BfsVertex<Tid>? Parent { get; internal set; }
+            public BfsVertex<Tid> Parent { get; internal set; }
             internal Color Color;
             public double Distance { get; internal set; } // d
-            public readonly Tid? Id;
+            public readonly Tid Id;
 
             public BfsVertex(Tid id)
             {

@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CSharpLibraries.Demos
@@ -11,7 +12,7 @@ namespace CSharpLibraries.Demos
 
         private sealed record SchemeList
         {
-            internal object Car;
+            [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local")] internal object Car;
             internal object Cdr;
 
             
@@ -27,100 +28,100 @@ namespace CSharpLibraries.Demos
         {
             return new()
             {
-                {"+",new Lambda(args =>
+                {"+",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count < 1) throw new ArgumentException();
+                    if (args.Length < 1) throw new ArgumentException();
                     var res = ConvertToNumber(args[0]);
-                    if (args.Count == 1 && res < 0)
+                    if (args.Length == 1 && res < 0)
                     {
                         res = -res;
                     }
-                    for (int i = 1; i < args.Count; i++)
+                    for (int i = 1; i < args.Length; i++)
                     {
                         res += args[i];
                     }
         
                     return res;
                 })}, 
-                {"-",new Lambda(args =>
+                {"-",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count < 1) throw new ArgumentException();
+                    if (args.Length < 1) throw new ArgumentException();
                     var res = ConvertToNumber(args[0]);
-                    if (args.Count == 1 && res > 0)
+                    if (args.Length == 1 && res > 0)
                     {
                         res = -res;
                     }
-                    for (int i = 1; i < args.Count; i++)
+                    for (int i = 1; i < args.Length; i++)
                     {
                         res -= args[i];
                     }
         
                     return res;
                 })}, 
-                {"*",new Lambda(args =>
+                {"*",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count <= 1) throw new ArgumentException();
+                    if (args.Length <= 1) throw new ArgumentException();
                     return args.Aggregate<object, double>(1, 
                         (current, t) => (double) (current * ConvertToNumber(t)));
                 })}, 
-                {"/",new Lambda(args =>
+                {"/",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count <= 1) throw new ArgumentException();
+                    if (args.Length <= 1) throw new ArgumentException();
                     var res = ConvertToNumber(args[0]);
-                    if (args.Count == 1 || res < 0)
+                    if (args.Length == 1 || res < 0)
                     {
                         res = -res;
                     }
-                    for (int i = 1; i < args.Count; i++)
+                    for (int i = 1; i < args.Length; i++)
                     {
                         res += args[i];
                     }
         
                     return res;
                 })},
-                {">",new Lambda(args =>
+                {">",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
         
                     return ConvertToNumber(args[0]) > ConvertToNumber(args[1]);
                 })},
-                {"<",new Lambda(args =>
+                {"<",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
         
                     return ConvertToNumber(args[0]) < ConvertToNumber(args[1]);
                 })},
-                {">=",new Lambda(args =>
+                {">=",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
         
                     return ConvertToNumber(args[0]) >= ConvertToNumber(args[1]);
                 })},
-                {"<=",new Lambda(args =>
+                {"<=",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
         
                     return ConvertToNumber(args[0]) <= ConvertToNumber(args[1]);
                 })},
-                {"=",new LambdaAction(args =>
+                {"=",new Action<object[]>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
                     GlobalEnv[args[0]] = args[1];
                 })},
-                {"abs",new Lambda(args =>
+                {"abs",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 1) throw new ArgumentException();
+                    if (args.Length != 1) throw new ArgumentException();
                     var res = ConvertToNumber(args[0]);
                     if (res < 0) return -res;
                     else return res;
                 })},
-                {"append",new LambdaAction(args =>
+                {"append",new Action<object[]>(args =>
                 {
-                    if (args.Count !< 2) throw new ArgumentException();
+                    if (args.Length !< 2) throw new ArgumentException();
                     SchemeList t = null;
-                    for (int i = args.Count - 1; i >= 0; i--)
+                    for (int i = args.Length - 1; i >= 0; i--)
                     {
-                        if (i == args.Count - 1)
+                        if (i == args.Length - 1)
                         {
                             t = new SchemeList(args[i], null);
                         }
@@ -130,25 +131,25 @@ namespace CSharpLibraries.Demos
                         }
                     }
                 })},
-                {"apply",new LambdaAction(args =>
+                {"apply",new Action<object[]>(args =>
                 {
                     dynamic proc = args[0];
                     proc(args);
                 })},
-                {"begin", new Lambda(args => args.Last())},
-                {"car", new Lambda(args =>
+                {"begin", new Func<object[], dynamic>(args => args.Last())},
+                {"car", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 1) throw new ArgumentException();
+                    if (args.Length != 1) throw new ArgumentException();
                     return ((SchemeList)args[0]).Car;
                 })},
-                {"cdr", new Lambda(args =>
+                {"cdr", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 1) throw new ArgumentException();
+                    if (args.Length != 1) throw new ArgumentException();
                     return ((SchemeList)(args[0])).Cdr;
                 })},
-                {"cons",new Lambda(args =>
+                {"cons",new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
                     if (args[0] is SchemeList s)
                     {
                         s.Cdr = args[1];
@@ -160,24 +161,24 @@ namespace CSharpLibraries.Demos
                     }
                     
                 })},
-                {"eq?", new Lambda(args =>
+                {"eq?", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
                     return args[0].Equals(args[1]);
                 })},
-                {"expt", new Lambda(args =>
+                {"expt", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
                     return Math.Pow(ConvertToNumber(args[0]), ConvertToNumber(args[1]));
                 })},
-                {"equal?", new Lambda(args =>
+                {"equal?", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 2) throw new ArgumentException();
+                    if (args.Length != 2) throw new ArgumentException();
                     return args[0].Equals(args[1]);
                 })},
-                {"length", new Lambda(args =>
+                {"length", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count != 1) throw new ArgumentException();
+                    if (args.Length != 1) throw new ArgumentException();
                     int len = 1;
                     dynamic ptr = args[0];
                     while (!ptr.Cdr.Equals("'()"))
@@ -187,12 +188,12 @@ namespace CSharpLibraries.Demos
                     }
                     return len;
                 })},
-                {"list", new Lambda(args =>
+                {"list", new Func<object[], dynamic>(args =>
                 {
-                    if (args.Count < 1) throw new ArgumentException();
+                    if (args.Length < 1) throw new ArgumentException();
                     dynamic res = new SchemeList();
                     res.Car = args[0];
-                    if (args.Count == 1)
+                    if (args.Length == 1)
                     {
                         res.Cdr = "'()";
                     }
@@ -200,7 +201,7 @@ namespace CSharpLibraries.Demos
                     {
                         res.Cdr = new SchemeList();
                         var ptr = res.Cdr;
-                        for (int i = 1; i < args.Count; i++)
+                        for (int i = 1; i < args.Length; i++)
                         {
                             ptr.Car = args[i];
                         }
@@ -208,45 +209,47 @@ namespace CSharpLibraries.Demos
         
                     return res;
                 })},
-                {"list?", new Lambda(args =>
+                {"list?", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     return args[0] is SchemeList;
                 })},
-                {"map", new LambdaAction(args => throw new NotImplementedException())},
-                {"max", new Lambda(args => args.Max())},
-                {"min", new Lambda(args => args.Min())},
-                {"not", new Lambda(args =>
+                // ReSharper disable once UnusedParameter.Local
+                {"map", new Action<object[]>(args => throw new NotImplementedException())},
+                {"max", new Func<object[], dynamic>(args => args.Max())},
+                {"min", new Func<object[], dynamic>(args => args.Min())},
+                {"not", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     return !(bool)args[0];
                 })},
-                {"null?", new Lambda(args =>
+                {"null?", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     return args[0].Equals("'()");
                 })}, 
-                {"number?", new Lambda(args =>
+                {"number?", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     dynamic type = args[0].GetType();
                     return type.Equals(typeof(int)) || type.Equals(typeof(double));
                 })},
-                {"print", new LambdaAction(args => throw new NotImplementedException())},
-                {"procedure?", new Lambda(args =>
+                // ReSharper disable once UnusedParameter.Local
+                {"print", new Action<object[]>(args => throw new NotImplementedException())},
+                {"procedure?", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     dynamic type = args[0].GetType();
-                    return type.Equals(typeof(Lambda)) || type.Equals(typeof(LambdaAction));
+                    return type.Equals(typeof(Func<object[], dynamic>)) || type.Equals(typeof(Action<object[]>));
                 })},
-                {"round", new Lambda(args =>
+                {"round", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     return Math.Round(ConvertToNumber(args[0]), MidpointRounding.AwayFromZero);
                 })},
-                {"symbol?", new Lambda(args =>
+                {"symbol?", new Func<object[], dynamic>(args =>
                 {
-                    if(args.Count != 1) throw new ArgumentException();
+                    if(args.Length != 1) throw new ArgumentException();
                     return ((string)args[0]).StartsWith("'");
                 })},
                 {"pi", Math.PI}
@@ -302,11 +305,7 @@ namespace CSharpLibraries.Demos
                 return proc(args);
             }
         }
-
-        private delegate dynamic Lambda(List<object> args);
-
-        private delegate void LambdaAction(List<object> args);
-
+        
         private static dynamic ReadFromTokens(Queue<string> tokens)
         {
             if (tokens.Count == 0) throw new ArgumentException("unexpected EOF");
