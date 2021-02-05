@@ -17,8 +17,8 @@ namespace CSharpLibraries.Algorithms.Structures
         {
             internal TKey Key;
             internal readonly TValue Value;
-            internal Node? Parent;
-            internal Node? ChildList; // int linked, circular list
+            internal Node Parent;
+            internal Node ChildList; // int linked, circular list
             internal Node Left;
             internal Node Right;
             internal int Degree; // number of children
@@ -38,7 +38,7 @@ namespace CSharpLibraries.Algorithms.Structures
         #endregion
 
 
-        internal Node? RootList;
+        internal Node RootList;
         public int Count { get; internal set; } // number of nodes
         private readonly Dictionary<TValue, Node> _valueToNodeMap = new();
         private readonly Func<TKey, TKey, int> _keyComparer;
@@ -92,7 +92,7 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private void Consolidate()
         {
-            var array = new Node?[UpperBound + 1];
+            var array = new Node[UpperBound + 1];
             var w = RootList;
             if (w == null) return;
 

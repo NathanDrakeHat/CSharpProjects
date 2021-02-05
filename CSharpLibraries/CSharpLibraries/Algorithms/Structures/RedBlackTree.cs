@@ -355,7 +355,7 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private void InsertFixUp(Node ptr)
         {
-            while (ptr.Parent.IsRed())
+            while (ptr.Parent!.IsRed())
             {
                 if (ptr.Parent == ptr.Parent.Parent.Left)
                 {
@@ -538,11 +538,24 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private Node Search(Node n, TKey key)
         {
-            if (n == _sentinel) return null;
-            if (_kComparator(n.Key, key) == 0) return n;
-            else if (n.Left != _sentinel && _kComparator(n.Key, key) > 0) return Search(n.Left, key);
-            else if (n.Right != _sentinel && _kComparator(n.Key, key) < 0) return Search(n.Right, key);
-            return null;
+            while (true)
+            {
+                if (n == _sentinel) return null;
+                if (_kComparator(n.Key, key) == 0)
+                    return n;
+                else if (n.Left != _sentinel && _kComparator(n.Key, key) > 0)
+                {
+                    n = n.Left;
+                    continue;
+                }
+                else if (n.Right != _sentinel && _kComparator(n.Key, key) < 0)
+                {
+                    n = n.Right;
+                    continue;
+                }
+
+                return null;
+            }
         }
 
         private void LeftRotate(Node leftNode)
@@ -609,7 +622,7 @@ namespace CSharpLibraries.Algorithms.Structures
             {
                 var target = current.Parent;
                 var targetRight = current;
-                while (target != _sentinel && target.Right == targetRight)
+                while (target != _sentinel && target!.Right == targetRight)
                 {
                     targetRight = target;
                     target = target.Parent;
@@ -627,7 +640,7 @@ namespace CSharpLibraries.Algorithms.Structures
             {
                 var target = current.Parent;
                 var targetLeft = current;
-                while (target != _sentinel && target.Left == targetLeft)
+                while (target != _sentinel && target!.Left == targetLeft)
                 {
                     targetLeft = target;
                     target = target.Parent;

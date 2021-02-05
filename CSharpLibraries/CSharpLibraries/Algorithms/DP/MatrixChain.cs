@@ -12,15 +12,15 @@ namespace CSharpLibraries.Algorithms.DP
         public class MatrixChainResult
         {
             public int MinCost;
-            internal Node? Res;
+            internal Node Res;
 
             internal class Node
             {
                 // arithmetic tree
                 // only leave store numbers
                 public readonly int Number; // a * b
-                public Node? Left;
-                public Node? Right;
+                public Node Left;
+                public Node Right;
 
                 // medium node without number
                 public Node()
