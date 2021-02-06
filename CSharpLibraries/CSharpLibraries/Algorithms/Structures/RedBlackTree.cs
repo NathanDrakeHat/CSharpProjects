@@ -13,38 +13,28 @@ namespace CSharpLibraries.Algorithms.Structures
     {
         #region InnerClass
 
+        private const bool Red = false;
+        private const bool Black = true;
         internal sealed class Node
         {
             // ReSharper disable once FieldCanBeMadeReadOnly.Global
             internal TKey Key;
             internal TValue Value;
-            internal NodeColor NodeColor;
+            internal bool Color;
             internal Node Parent;
             internal Node Left;
             internal Node Right;
 
-            internal Node(NodeColor nodeColor) => NodeColor = nodeColor;
+            internal Node(bool color) => Color = color;
 
             internal Node(TKey key, TValue val)
             {
-                NodeColor = NodeColor.Red;
+                Color = Red;
                 Key = key;
                 Value = val;
             }
-
-
-            internal bool IsRed() => NodeColor == NodeColor.Red;
-            internal bool IsBlack() => NodeColor == NodeColor.Black;
-
-            internal void SetBlack() => NodeColor = NodeColor.Black;
-            internal void SetRed() => NodeColor = NodeColor.Red;
         }
-
-        internal enum NodeColor
-        {
-            Red,
-            Black
-        }
+        
 
         #endregion
 
@@ -52,7 +42,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public int Count { get; private set; }
         internal Node Root;
         private readonly Func<TKey, TKey, int> _kComparator;
-        private readonly Node _sentinel = new Node(NodeColor.Black); // sentinel: denote leaf and parent of root
+        private readonly Node _sentinel = new Node(Black); // sentinel: denote leaf and parent of root
 
 
         /// <summary>
@@ -355,17 +345,17 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private void InsertFixUp(Node ptr)
         {
-            while (ptr.Parent!.IsRed())
+            while (ptr.Parent!.Color == Red)
             {
                 if (ptr.Parent == ptr.Parent.Parent.Left)
                 {
                     var right = ptr.Parent.Parent.Right;
-                    if (right.IsRed())
+                    if (right.Color == Red)
                     {
                         // case1: sibling is red
-                        ptr.Parent.SetBlack();
-                        right.SetBlack();
-                        ptr.Parent.Parent.SetRed();
+                        ptr.Parent.Color = Black;
+                        right.Color = Black;
+                        ptr.Parent.Parent.Color = Red;
                         ptr = ptr.Parent.Parent;
                         continue;
                     }
@@ -376,19 +366,19 @@ namespace CSharpLibraries.Algorithms.Structures
                         LeftRotate(ptr);
                     }
 
-                    ptr.Parent.SetBlack(); // case3
-                    ptr.Parent.Parent.SetRed();
+                    ptr.Parent.Color = Black; // case3
+                    ptr.Parent.Parent.Color = Red;
                     RightRotate(ptr.Parent.Parent); // ptr.getParent will be black and then break
                     ptr = ptr.Parent;
                 }
                 else
                 {
                     var left = ptr.Parent.Parent.Left;
-                    if (left.IsRed())
+                    if (left.Color == Red)
                     {
-                        ptr.Parent.SetBlack();
-                        left.SetBlack();
-                        ptr.Parent.Parent.SetRed();
+                        ptr.Parent.Color = Black;
+                        left.Color = Black;
+                        ptr.Parent.Parent.Color = Red;
                         ptr = ptr.Parent.Parent;
                         continue;
                     }
@@ -398,20 +388,20 @@ namespace CSharpLibraries.Algorithms.Structures
                         RightRotate(ptr);
                     }
 
-                    ptr.Parent.SetBlack();
-                    ptr.Parent.Parent.SetRed();
+                    ptr.Parent.Color = Black;
+                    ptr.Parent.Parent.Color = Red;
                     LeftRotate(ptr.Parent.Parent);
                     ptr = ptr.Parent;
                 }
             }
 
-            Root.SetBlack();
+            Root.Color = Black;
         }
 
         private void Delete(Node target)
         {
             var ptr = target;
-            var ptrColor = ptr.NodeColor;
+            var ptrColor = ptr.Color;
             Node fixUp;
             if (ptr.Left == _sentinel)
             {
@@ -426,7 +416,7 @@ namespace CSharpLibraries.Algorithms.Structures
             else
             {
                 ptr = GetSuccessor(target);
-                ptrColor = ptr.NodeColor;
+                ptrColor = ptr.Color;
                 fixUp = ptr.Right;
                 // in case of sentinel refer to target
                 if (ptr.Parent == target) fixUp.Parent = ptr;
@@ -440,85 +430,85 @@ namespace CSharpLibraries.Algorithms.Structures
                 Transplant(target, ptr);
                 ptr.Left = target.Left;
                 target.Left.Parent = ptr;
-                ptr.NodeColor = target.NodeColor;
+                ptr.Color = target.Color;
             }
 
-            if (ptrColor == NodeColor.Black) DeleteFixUp(fixUp);
+            if (ptrColor == Black) DeleteFixUp(fixUp);
         }
 
         private void DeleteFixUp(Node fixUp)
         {
-            while (fixUp != Root && fixUp.IsBlack())
+            while (fixUp != Root && fixUp.Color == Black)
             {
                 Node sibling;
                 if (fixUp == fixUp.Parent.Left)
                 {
                     sibling = fixUp.Parent.Right;
-                    if (sibling.IsRed())
+                    if (sibling.Color == Red)
                     {
                         // case1:sibling is black, convert to case 2, 3 or 4
-                        sibling.SetBlack(); // , which denote that sibling is black
-                        fixUp.Parent.SetRed();
+                        sibling.Color = Black; // , which denote that sibling is black
+                        fixUp.Parent.Color = Red;
                         LeftRotate(fixUp.Parent);
                         sibling = fixUp.Parent.Right;
                     }
 
-                    if (sibling.Left.IsBlack() && sibling.Right.IsBlack())
+                    if (sibling.Left.Color == Black && sibling.Right.Color == Black)
                     {
                         // case2: sibling children is black
-                        sibling.SetRed();
+                        sibling.Color = Red;
                         fixUp = fixUp.Parent;
                         continue;
                     }
-                    else if (sibling.Right.IsBlack())
+                    else if (sibling.Right.Color == Black)
                     {
                         // case3: sibling left red, right black. convert case4
-                        sibling.Left.SetBlack();
-                        sibling.SetRed();
+                        sibling.Left.Color = Black;
+                        sibling.Color = Red;
                         RightRotate(sibling);
                         sibling = fixUp.Parent.Right;
                     }
 
-                    sibling.NodeColor = fixUp.Parent.NodeColor; // case4: sibling right red
-                    fixUp.Parent.SetBlack();
-                    sibling.Right.SetBlack();
+                    sibling.Color = fixUp.Parent.Color; // case4: sibling right red
+                    fixUp.Parent.Color = Black;
+                    sibling.Right.Color = Black;
                     LeftRotate(fixUp.Parent);
                 }
                 else
                 {
                     sibling = fixUp.Parent.Left;
-                    if (sibling.IsRed())
+                    if (sibling.Color == Red)
                     {
-                        sibling.SetBlack();
-                        fixUp.Parent.SetRed();
+                        sibling.Color = Black;
+                        fixUp.Parent.Color = Red;
                         RightRotate(fixUp.Parent);
                         sibling = fixUp.Parent.Left;
                     }
 
-                    if (sibling.Left.IsBlack() && sibling.Right.IsBlack())
+                    if (sibling.Left.Color == Black && sibling.Right.Color == Black)
                     {
-                        sibling.SetRed();
+                        sibling.Color = Red;
                         fixUp = fixUp.Parent;
                         continue;
                     }
-                    else if (sibling.Left.IsBlack())
+                    else if (sibling.Left.Color == Black)
                     {
-                        sibling.Right.SetBlack();
-                        sibling.SetRed();
+                        sibling.Right.Color = Black;
+                        sibling.Color = Red;
                         LeftRotate(sibling);
                         sibling = fixUp.Parent.Left;
                     }
 
-                    sibling.NodeColor = fixUp.Parent.NodeColor;
-                    fixUp.Parent.SetBlack();
-                    sibling.Left.SetBlack();
+                    sibling.Color = fixUp.Parent.Color;
+                    fixUp.Parent.Color = Black;
+                    sibling.Left.Color = Black;
                     RightRotate(fixUp.Parent);
                 }
 
                 fixUp = Root;
             }
 
-            fixUp.SetBlack();
+            fixUp.Color = Black;
         }
 
         private void Transplant(Node a, Node b)
