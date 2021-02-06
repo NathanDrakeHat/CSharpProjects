@@ -15,6 +15,7 @@ namespace CSharpLibraries.Algorithms.Structures
 
         private const bool Red = false;
         private const bool Black = true;
+
         internal sealed class Node
         {
             // ReSharper disable once FieldCanBeMadeReadOnly.Global
@@ -34,7 +35,6 @@ namespace CSharpLibraries.Algorithms.Structures
                 Value = val;
             }
         }
-        
 
         #endregion
 
