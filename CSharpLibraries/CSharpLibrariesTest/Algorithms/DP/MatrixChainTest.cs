@@ -1,7 +1,7 @@
 ﻿using CSharpLibraries.Algorithms.DP;
-using CSharpLibraries.Extensions;
+using CSharpLibraries.Utils;
 using NUnit.Framework;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 
 
 namespace CSharpLibrariesTest.Algorithms.DP

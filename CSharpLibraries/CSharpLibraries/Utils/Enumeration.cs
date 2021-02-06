@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace CSharpLibraries.Extensions
+namespace CSharpLibraries.Utils
 {
     public class Enumeration : IEnumerable<int>
     {

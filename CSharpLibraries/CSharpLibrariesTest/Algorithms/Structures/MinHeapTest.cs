@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CSharpLibraries.Algorithms.Structures;
 using NUnit.Framework;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 
 namespace CSharpLibrariesTest.Algorithms.Structures
 {

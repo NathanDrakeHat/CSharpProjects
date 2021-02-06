@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSharpLibraries.Extensions;
+using CSharpLibraries.Utils;
 using NUnit.Framework;
 using static CSharpLibraries.Algorithms.Miscellaneous.Sort;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 
 namespace CSharpLibrariesTest.Algorithms.Miscellaneous
 {

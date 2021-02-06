@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using CSharpLibraries.Algorithms.Miscellaneous;
-using CSharpLibraries.Extensions;
+using CSharpLibraries.Utils;
 using NUnit.Framework;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 using static CSharpLibraries.Algorithms.Miscellaneous.RankSearch;
 
 namespace CSharpLibrariesTest.Algorithms.Miscellaneous

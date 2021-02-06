@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {

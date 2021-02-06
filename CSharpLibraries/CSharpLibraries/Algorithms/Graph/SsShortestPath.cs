@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSharpLibraries.Algorithms.Structures;
-using static CSharpLibraries.Extensions.Extension;
+using static CSharpLibraries.Utils.Extension;
 
 namespace CSharpLibraries.Algorithms.Graph
 {
