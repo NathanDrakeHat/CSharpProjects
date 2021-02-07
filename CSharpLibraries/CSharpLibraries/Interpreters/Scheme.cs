@@ -13,7 +13,29 @@ namespace CSharpLibraries.Interpreters
 {
     public static class Scheme
     {
-        private static readonly SchemeEnv GlobalEnv = StandardEnv();
+        private class ArgumentAmountException : Exception
+        {
+            private readonly string _number;
+            public ArgumentAmountException(string a)
+            {
+                _number = a;
+            }
+
+            public override string ToString()
+            {
+                return $"expected: {_number}";
+            }
+        }
+
+        private class ParseException : Exception
+        {
+            public ParseException(string s) :base(s)
+            {
+                
+            }
+        }
+        
+        public static readonly Env GlobalEnv = StandardEnv();
 
         internal sealed record SchemeList : IEnumerable<object>
         {
@@ -113,11 +135,11 @@ namespace CSharpLibraries.Interpreters
             }
         }
 
-        private sealed class SchemeEnv : Dictionary<object, dynamic>
+        public sealed class Env : Dictionary<object, dynamic>
         {
-            private readonly SchemeEnv _outer;
+            private readonly Env _outer;
 
-            public SchemeEnv(IEnumerable parameters, IEnumerable args, SchemeEnv outer = null)
+            public Env(IEnumerable parameters, IEnumerable args, Env outer = null)
             {
                 var paramEnum = parameters.GetEnumerator();
                 var argsEnum = args.GetEnumerator();
@@ -129,20 +151,20 @@ namespace CSharpLibraries.Interpreters
                 _outer = outer;
             }
 
-            public SchemeEnv Find(object variable)
+            public Env Find(object variable)
                 => ContainsKey(variable) ? this : _outer.Find(variable);
         }
 
         private const string Nil = "'()";
 
-        private static SchemeEnv StandardEnv()
+        private static Env StandardEnv()
         {
             var d = new Dictionary<object, object>()
             {
                 {
                     "+", new Lambda(args =>
                     {
-                        if (args.Count < 1) throw new ArgumentException();
+                        if (args.Count < 1) throw new ArgumentAmountException(">=2");
                         double res = 0;
                         dynamic first = args[0];
                         if (args.Count == 1 && first < 0)
@@ -164,29 +186,28 @@ namespace CSharpLibraries.Interpreters
                 {
                     "-", new Lambda(args =>
                     {
-                        if (args.Count < 1) throw new ArgumentException();
-                        double res = 0;
                         dynamic first = args[0];
-                        if (args.Count == 1 && first < 0)
+                        switch (args.Count)
                         {
-                            return -first;
-                        }
-                        else
-                        {
-                            for (int i = 0; i < args.Count; i++)
-                            {
-                                dynamic t = args[i];
-                                res -= t;
-                            }
+                            case 1:
+                                if (first > 0)
+                                {
+                                    first = -first;
+                                }
 
-                            return res;
+                                return first;
+                            case 2:
+                                dynamic second = args[1];
+                                return first - second;
+                            default:
+                                throw new ArgumentAmountException("1 or 2");
                         }
                     })
                 },
                 {
                     "*", new Lambda(args =>
                     {
-                        if (args.Count <= 1) throw new ArgumentException();
+                        if (args.Count <= 1) throw new ArgumentAmountException("> 1");
                         double r = 1;
                         foreach (dynamic i in args)
                         {
@@ -199,7 +220,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "/", new Lambda(args =>
                     {
-                        if (args.Count <= 1 || args.Count > 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         dynamic a = args[0];
                         dynamic b = args[1];
                         return a / b;
@@ -208,7 +229,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     ">", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         dynamic a = args[0];
                         dynamic b = args[1];
                         return a > b;
@@ -217,7 +238,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "<", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         dynamic a = args[0];
                         dynamic b = args[1];
                         return a < b;
@@ -226,7 +247,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     ">=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
 
                         dynamic a = args[0];
                         dynamic b = args[1];
@@ -236,24 +257,26 @@ namespace CSharpLibraries.Interpreters
                 {
                     "<=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
 
                         dynamic a = args[0];
                         dynamic b = args[1];
-                        return a < b;
+                        return a <= b;
                     })
                 },
                 {
-                    "=", new LambdaAction(args =>
+                    "=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
-                        GlobalEnv[args[0]] = args[1];
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        dynamic a = args[0];
+                        dynamic b = args[1];
+                        return a.Equals(b);
                     })
                 },
                 {
                     "abs", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         dynamic res = args[0];
                         if (res < 0) return -res;
                         else return res;
@@ -262,7 +285,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "append", new Lambda(args =>
                     {
-                        if (args.Count < 2) throw new ArgumentException();
+                        if (args.Count < 2) throw new ArgumentAmountException(">=2");
                         for (int i = 0; i < args.Count - 1; i++)
                         {
                             dynamic list = args[i];
@@ -284,21 +307,21 @@ namespace CSharpLibraries.Interpreters
                 {
                     "car", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return ((SchemeList) args[0]).Car;
                     })
                 },
                 {
                     "cdr", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return ((SchemeList) args[0]).Cdr;
                     })
                 },
                 {
                     "cons", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         if (args[0] is SchemeList s)
                         {
                             s.Cdr = args[1];
@@ -313,14 +336,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "eq?", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         return args[0].Equals(args[1]);
                     })
                 },
                 {
                     "expt", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         dynamic a = args[0];
                         dynamic b = args[1];
                         return Math.Pow(a, b);
@@ -329,14 +352,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "equal?", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentException();
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
                         return args[0].Equals(args[1]);
                     })
                 },
                 {
                     "length", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         int len = 1;
                         dynamic ptr = args[0];
                         while (!ptr.Cdr.Equals(Nil))
@@ -351,7 +374,10 @@ namespace CSharpLibraries.Interpreters
                 {
                     "list", new Lambda(args =>
                     {
-                        if (args.Count < 1) throw new ArgumentException();
+                        if (args.Count < 1)
+                        {
+                            return new SchemeList(Nil);
+                        }
                         var res = new SchemeList(args[0]);
                         var p = res;
                         for (int i = 1; i < args.Count; i++)
@@ -365,14 +391,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "list?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return args[0] is SchemeList;
                     })
                 },
                 {
                     "map", new Lambda(args =>
                     {
-                        if (args.Count < 2) throw new ArgumentException();
+                        if (args.Count < 2) throw new ArgumentAmountException(">=2");
                         dynamic func = args[0];
                         dynamic dArgs = args;
                         var elements0 = new List<object>();
@@ -414,27 +440,27 @@ namespace CSharpLibraries.Interpreters
                 {
                     "not", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return !(bool) args[0];
                     })
                 },
                 {
                     "null?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return args[0].Equals(Nil);
                     })
                 },
                 {
                     "number?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         dynamic type = args[0].GetType();
                         return type.Equals(typeof(int)) || type.Equals(typeof(double));
                     })
                 },
                 {
-                    "print", new LambdaAction(args =>
+                    "print", new Lambda(args =>
                     {
                         StringBuilder b = new StringBuilder();
                         for (int i = 0; i < args.Count - 1; i++)
@@ -445,20 +471,21 @@ namespace CSharpLibraries.Interpreters
 
                         b.Append(args[^1]);
                         Console.WriteLine(b.ToString());
+                        return null;
                     })
                 },
                 {
                     "procedure?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         var type = args[0].GetType();
-                        return type == typeof(Lambda) || type == typeof(LambdaAction);
+                        return type == typeof(Lambda) || type == typeof(Lambda);
                     })
                 },
                 {
                     "round", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         dynamic a = args[0];
                         return Math.Round(a, MidpointRounding.AwayFromZero);
                     })
@@ -466,7 +493,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "symbol?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return args[0] is string;
                     })
                 },
@@ -475,30 +502,32 @@ namespace CSharpLibraries.Interpreters
                     "quote",
                     new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentException();
+                        if (args.Count != 1) throw new ArgumentAmountException("1");
                         return args[0];
                     })
                 },
+                {
+                    "'()",
+                    Nil
+                }
             };
-            var env = new SchemeEnv(d.Keys, d.Values);
+            var env = new Env(d.Keys, d.Values);
             return env;
         }
 
+        public static dynamic RunScheme(string program) => Eval(Parse(program));
+
         public static dynamic Parse(string program) => ParseTokens(Tokenize(program));
 
-        public static dynamic Eval(dynamic x)
+        private static dynamic Eval(dynamic x) => Eval(x, GlobalEnv);
+        
+        private static dynamic Eval(dynamic x, Env currentEnv)
         {
-            return Eval(x, GlobalEnv);
-        }
-
-        private static dynamic Eval(dynamic x, SchemeEnv env)
-        {
-            // var env = GlobalEnv;
             if (x.GetType().Equals(typeof(string)))
             {
-                return env[x];
+                return currentEnv.Find(x)[x];
             }
-            else if (x.GetType().Equals(typeof(int)) || x.GetType().Equals(typeof(double)))
+            else if (!(x is List<object>))
             {
                 return x;
             }
@@ -512,22 +541,23 @@ namespace CSharpLibraries.Interpreters
                     dynamic test = args[0];
                     dynamic conseq = args[1];
                     dynamic alt = args[2];
-                    dynamic exp = Eval(test) ? conseq : alt;
-                    return Eval(exp);
+                    dynamic exp = Eval(test, currentEnv) ? conseq : alt;
+                    return Eval(exp,currentEnv);
                 case "define":
                     dynamic symbol = args[0];
                     dynamic expression = args[1];
-                    env[symbol] = Eval(expression, env);
+                    currentEnv[symbol] = Eval(expression, currentEnv);
                     return null;
                 case "lambda":
-                    // TODO implement procedure
-                    return null;
+                    dynamic parameters = args[0];
+                    dynamic body = args[1];
+                    return new Lambda(arguments => Eval(body, new Env(parameters, arguments, currentEnv)));
                 default:
-                    dynamic proc = Eval(op, env);
+                    dynamic proc = Eval(op, currentEnv);
                     List<object> vals = new List<object>();
                     foreach (var arg in args)
                     {
-                        vals.Add(Eval(arg,env));
+                        vals.Add(Eval(arg,currentEnv));
                     }
                     return proc(vals);
             }
@@ -537,7 +567,20 @@ namespace CSharpLibraries.Interpreters
         {
             while (true)
             {
-                dynamic val = Eval(Parse(ReadLine(prompt)));
+                var s = ReadLine(prompt);
+                if (s == "")
+                {
+                    continue;
+                }
+                dynamic val = null;
+                try
+                {
+                    val = Eval(Parse(s));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"{e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+                }
                 if (val != null)
                 {
                     Console.WriteLine(val);
@@ -548,9 +591,7 @@ namespace CSharpLibraries.Interpreters
         }
 
         private delegate dynamic Lambda(List<object> args);
-
-        private delegate void LambdaAction(List<object> args);
-
+        
         private static string ReadLine(string prompt = "lis.py>>>")
         {
             Console.Write(prompt);
@@ -558,14 +599,14 @@ namespace CSharpLibraries.Interpreters
         }
 
         /// <summary>
-        /// tokens to tree
+        /// tokens to string tree
         /// </summary>
         /// <param name="tokens">list of tokens</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ParseException"></exception>
         private static dynamic ParseTokens(Queue<string> tokens)
         {
-            if (tokens.Count == 0) throw new ArgumentException("unexpected EOF");
+            if (tokens.Count == 0) throw new ParseException("unexpected EOF");
             var token = tokens.Dequeue();
             switch (token)
             {
@@ -581,7 +622,7 @@ namespace CSharpLibraries.Interpreters
                     return l;
                 }
                 case ")":
-                    throw new ArgumentException("unexpected ')'");
+                    throw new ParseException("unexpected ')'");
                 default:
                     return ConvertToAtom(token);
             }
