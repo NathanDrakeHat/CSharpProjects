@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using static CSharpLibraries.Interpreters.Scheme;
-using static CSharpLibraries.Utils.Extension;
 
 namespace CSharpLibrariesTest.Interpreters
 {
