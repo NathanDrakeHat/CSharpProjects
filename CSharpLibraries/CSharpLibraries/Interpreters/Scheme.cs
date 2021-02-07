@@ -1,18 +1,25 @@
-﻿using System;
+﻿#nullable disable
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace CSharpLibraries.Scheme
+// TODO extend
+[assembly: InternalsVisibleTo("CSarpLibrariesTest")]
+
+namespace CSharpLibraries.Interpreters
 {
     public static class Scheme
     {
-        private static readonly Dictionary<object, dynamic> GlobalEnv = StandardEnv();
+        private static readonly SchemeEnv GlobalEnv = StandardEnv();
 
-        private sealed record SchemeList
+        internal sealed record SchemeList : IEnumerable<object>
         {
             private object _car;
             private object _cdr;
+
             internal dynamic Car
             {
                 get => _car;
@@ -25,9 +32,29 @@ namespace CSharpLibraries.Scheme
                 set => _cdr = value;
             }
 
-
-            public SchemeList()
+            public int Count
             {
+                get
+                {
+                    int r = 0;
+                    if (Cdr.Equals(Nil))
+                    {
+                        r++;
+                    }
+                    else
+                    {
+                        r += Cdr.Count + 1;
+                    }
+
+                    return r;
+                }
+            }
+
+
+            public SchemeList(object o)
+            {
+                Car = o;
+                Cdr = Nil;
             }
 
             public SchemeList(object car, object cdr)
@@ -35,11 +62,82 @@ namespace CSharpLibraries.Scheme
                 Car = car;
                 Cdr = cdr;
             }
+
+            /// <summary>
+            /// append element of list
+            /// </summary>
+            /// <param name="o">object</param>
+            /// <returns>cdr</returns>
+            public SchemeList ChainAppend(object o)
+            {
+                if (!(o is SchemeList))
+                {
+                    Cdr = new SchemeList(o);
+                    return Cdr;
+                }
+                else
+                {
+                    Cdr = o;
+                    return Cdr;
+                }
+            }
+
+            public IEnumerator<object> GetEnumerator()
+            {
+                dynamic t = this;
+                while (!t.Equals(Nil))
+                {
+                    var r = t.Car;
+                    t = t.Cdr;
+                    yield return r;
+                }
+            }
+
+            public override string ToString()
+            {
+                var b = new StringBuilder("[");
+                foreach (var e in this)
+                {
+                    b.Append(e);
+                    b.Append(", ");
+                }
+
+                b.Remove(b.Length - 2, 2);
+                b.Append(']');
+                return b.ToString();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
 
-        private static Dictionary<object, object> StandardEnv()
+        private sealed class SchemeEnv : Dictionary<object, dynamic>
         {
-            return new()
+            private readonly SchemeEnv _outer;
+
+            public SchemeEnv(IEnumerable parameters, IEnumerable args, SchemeEnv outer = null)
+            {
+                var paramEnum = parameters.GetEnumerator();
+                var argsEnum = args.GetEnumerator();
+                while (paramEnum.MoveNext() && argsEnum.MoveNext())
+                {
+                    this[paramEnum.Current!] = argsEnum.Current;
+                }
+
+                _outer = outer;
+            }
+
+            public SchemeEnv Find(object variable)
+                => ContainsKey(variable) ? this : _outer.Find(variable);
+        }
+
+        private const string Nil = "'()";
+
+        private static SchemeEnv StandardEnv()
+        {
+            var d = new Dictionary<object, object>()
             {
                 {
                     "+", new Lambda(args =>
@@ -162,31 +260,27 @@ namespace CSharpLibraries.Scheme
                     })
                 },
                 {
-                    "append", new LambdaAction(args =>
+                    "append", new Lambda(args =>
                     {
-                        if (args.Count ! < 2) throw new ArgumentException();
-                        SchemeList t = null;
-                        for (int i = args.Count - 1; i >= 0; i--)
+                        if (args.Count < 2) throw new ArgumentException();
+                        for (int i = 0; i < args.Count - 1; i++)
                         {
-                            if (i == args.Count - 1)
-                            {
-                                t = new SchemeList(args[i], null);
-                            }
-                            else
-                            {
-                                t = new SchemeList(args[i], t);
-                            }
+                            dynamic list = args[i];
+                            dynamic list1 = args[i + 1];
+                            list.Append(list1);
                         }
+
+                        return args[0];
                     })
                 },
                 {
-                    "apply", new LambdaAction(args =>
+                    "apply", new Lambda(args =>
                     {
                         dynamic proc = args[0];
-                        proc(args);
+                        return proc(args);
                     })
                 },
-                {"begin", new Lambda(args => args.Last())},
+                {"begin", new Lambda(args => args[^1])},
                 {
                     "car", new Lambda(args =>
                     {
@@ -198,7 +292,7 @@ namespace CSharpLibraries.Scheme
                     "cdr", new Lambda(args =>
                     {
                         if (args.Count != 1) throw new ArgumentException();
-                        return ((SchemeList) (args[0])).Cdr;
+                        return ((SchemeList) args[0]).Cdr;
                     })
                 },
                 {
@@ -212,7 +306,7 @@ namespace CSharpLibraries.Scheme
                         }
                         else
                         {
-                            return new SchemeList(args[0], new SchemeList(args[1], null));
+                            return new SchemeList(args[0], args[1]);
                         }
                     })
                 },
@@ -245,7 +339,7 @@ namespace CSharpLibraries.Scheme
                         if (args.Count != 1) throw new ArgumentException();
                         int len = 1;
                         dynamic ptr = args[0];
-                        while (!ptr.Cdr.Equals("'()"))
+                        while (!ptr.Cdr.Equals(Nil))
                         {
                             ptr = ptr.Cdr;
                             len++;
@@ -258,20 +352,11 @@ namespace CSharpLibraries.Scheme
                     "list", new Lambda(args =>
                     {
                         if (args.Count < 1) throw new ArgumentException();
-                        dynamic res = new SchemeList();
-                        res.Car = args[0];
-                        if (args.Count == 1)
+                        var res = new SchemeList(args[0]);
+                        var p = res;
+                        for (int i = 1; i < args.Count; i++)
                         {
-                            res.Cdr = "'()";
-                        }
-                        else
-                        {
-                            res.Cdr = new SchemeList();
-                            var ptr = res.Cdr;
-                            for (int i = 1; i < args.Count; i++)
-                            {
-                                ptr.Car = args[i];
-                            }
+                            p = p.ChainAppend(args[i]);
                         }
 
                         return res;
@@ -284,7 +369,46 @@ namespace CSharpLibraries.Scheme
                         return args[0] is SchemeList;
                     })
                 },
-                {"map", new LambdaAction(args => throw new NotImplementedException())},
+                {
+                    "map", new Lambda(args =>
+                    {
+                        if (args.Count < 2) throw new ArgumentException();
+                        dynamic func = args[0];
+                        dynamic dArgs = args;
+                        var elements0 = new List<object>();
+                        for (int i = 1; i < dArgs.Count; i++)
+                        {
+                            elements0.Add(dArgs[i].Car);
+                            dArgs[i] = dArgs[i].Cdr;
+                        }
+
+                        var r = new SchemeList(func(elements0));
+                        var p = r;
+                        while (true)
+                        {
+                            var elements = new List<object>();
+                            for (int i = 1; i < dArgs.Count; i++)
+                            {
+                                if (dArgs[i] != ".()")
+                                {
+                                    elements.Add(dArgs[i].Car);
+                                    dArgs[i] = dArgs[i].Cdr;
+                                }
+                            }
+
+                            if (elements.Count == args.Count - 1)
+                            {
+                                p = p.ChainAppend(func(elements));
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        return r;
+                    })
+                },
                 {"max", new Lambda(args => args.Max())},
                 {"min", new Lambda(args => args.Min())},
                 {
@@ -298,7 +422,7 @@ namespace CSharpLibraries.Scheme
                     "null?", new Lambda(args =>
                     {
                         if (args.Count != 1) throw new ArgumentException();
-                        return args[0].Equals("'()");
+                        return args[0].Equals(Nil);
                     })
                 },
                 {
@@ -309,23 +433,26 @@ namespace CSharpLibraries.Scheme
                         return type.Equals(typeof(int)) || type.Equals(typeof(double));
                     })
                 },
-                {"print", new LambdaAction(args =>
                 {
-                    StringBuilder b = new StringBuilder();
-                    for (int i = 0; i < args.Count - 1; i++)
+                    "print", new LambdaAction(args =>
                     {
-                        b.Append(args[i]);
-                        b.Append(' ');
-                    }
-                    b.Append(args[^1]);
-                    Console.WriteLine(b.ToString());
-                })},
+                        StringBuilder b = new StringBuilder();
+                        for (int i = 0; i < args.Count - 1; i++)
+                        {
+                            b.Append(args[i]);
+                            b.Append(' ');
+                        }
+
+                        b.Append(args[^1]);
+                        Console.WriteLine(b.ToString());
+                    })
+                },
                 {
                     "procedure?", new Lambda(args =>
                     {
                         if (args.Count != 1) throw new ArgumentException();
-                        dynamic type = args[0].GetType();
-                        return type.Equals(typeof(Lambda)) || type.Equals(typeof(LambdaAction));
+                        var type = args[0].GetType();
+                        return type == typeof(Lambda) || type == typeof(LambdaAction);
                     })
                 },
                 {
@@ -340,18 +467,33 @@ namespace CSharpLibraries.Scheme
                     "symbol?", new Lambda(args =>
                     {
                         if (args.Count != 1) throw new ArgumentException();
-                        return ((string) args[0]).StartsWith("'");
+                        return args[0] is string;
                     })
                 },
-                {"pi", Math.PI}
+                {"pi", Math.PI},
+                {
+                    "quote",
+                    new Lambda(args =>
+                    {
+                        if (args.Count != 1) throw new ArgumentException();
+                        return args[0];
+                    })
+                },
             };
+            var env = new SchemeEnv(d.Keys, d.Values);
+            return env;
         }
 
-        public static List<object> Parse(string program) => ReadFromTokens(Tokenize(program));
+        public static dynamic Parse(string program) => ParseTokens(Tokenize(program));
 
         public static dynamic Eval(dynamic x)
         {
-            var env = GlobalEnv;
+            return Eval(x, GlobalEnv);
+        }
+
+        private static dynamic Eval(dynamic x, SchemeEnv env)
+        {
+            // var env = GlobalEnv;
             if (x.GetType().Equals(typeof(string)))
             {
                 return env[x];
@@ -360,48 +502,68 @@ namespace CSharpLibraries.Scheme
             {
                 return x;
             }
-            else if (x[0] == "if")
-            {
-                dynamic test = x[1];
-                dynamic conseq = x[2];
-                dynamic alt = x[3];
-                dynamic exp = Eval(test) ? conseq : alt;
-                return Eval(exp);
-            }
-            else if (x[0] == "define")
-            {
-                dynamic symbol = x[1];
-                dynamic exp = x[2];
-                env[symbol] = Eval(exp);
-                return null;
-            }
-            else
-            {
-                dynamic proc = Eval(x[0]);
-                List<object> args = new List<object>();
-                int i = 0;
 
-                foreach (dynamic arg in x)
+            var op = x[0];
+            var args = x.GetRange(1, x.Count-1);
+
+            switch (op)
+            {
+                case "if":
+                    dynamic test = args[0];
+                    dynamic conseq = args[1];
+                    dynamic alt = args[2];
+                    dynamic exp = Eval(test) ? conseq : alt;
+                    return Eval(exp);
+                case "define":
+                    dynamic symbol = args[0];
+                    dynamic expression = args[1];
+                    env[symbol] = Eval(expression, env);
+                    return null;
+                case "lambda":
+                    // TODO implement procedure
+                    return null;
+                default:
+                    dynamic proc = Eval(op, env);
+                    List<object> vals = new List<object>();
+                    foreach (var arg in args)
+                    {
+                        vals.Add(Eval(arg,env));
+                    }
+                    return proc(vals);
+            }
+        }
+
+        public static void Repl(string prompt = "NScheme>")
+        {
+            while (true)
+            {
+                dynamic val = Eval(Parse(ReadLine(prompt)));
+                if (val != null)
                 {
-                    if (i != 0)
-                    {
-                        args.Add(Eval(arg));
-                    }
-                    else
-                    {
-                        i++;
-                    }
+                    Console.WriteLine(val);
                 }
-
-                return proc(args);
             }
+
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private delegate dynamic Lambda(List<object> args);
 
         private delegate void LambdaAction(List<object> args);
 
-        private static dynamic ReadFromTokens(Queue<string> tokens)
+        private static string ReadLine(string prompt = "lis.py>>>")
+        {
+            Console.Write(prompt);
+            return Console.ReadLine();
+        }
+
+        /// <summary>
+        /// tokens to tree
+        /// </summary>
+        /// <param name="tokens">list of tokens</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private static dynamic ParseTokens(Queue<string> tokens)
         {
             if (tokens.Count == 0) throw new ArgumentException("unexpected EOF");
             var token = tokens.Dequeue();
@@ -412,7 +574,7 @@ namespace CSharpLibraries.Scheme
                     var l = new List<object>();
                     while (!tokens.Peek().Equals(")"))
                     {
-                        l.Add(ReadFromTokens(tokens));
+                        l.Add(ParseTokens(tokens));
                     }
 
                     tokens.Dequeue();
@@ -425,6 +587,11 @@ namespace CSharpLibraries.Scheme
             }
         }
 
+        /// <summary>
+        /// string to list of tokens
+        /// </summary>
+        /// <param name="program">string</param>
+        /// <returns>tokens list</returns>
         private static Queue<string> Tokenize(string program)
         {
             var t = program.Replace("(", " ( ").Replace(")", " ) ").Split().ToList();

@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
-using static CSharpLibraries.Scheme.Scheme;
+using static CSharpLibraries.Interpreters.Scheme;
 
-namespace CSharpLibrariesTest.Scheme
+namespace CSharpLibrariesTest.Interpreters
 {
     public static class SchemeTest
     {
@@ -31,6 +32,12 @@ namespace CSharpLibrariesTest.Scheme
         public static void EvalTest()
         {
             Assert.AreEqual(314.1592653589793,Eval(Parse("(begin (define r 10) (* pi (* r r)))")));
+            Assert.AreEqual(42, Eval(Parse("(if (> (* 11 11) 120) (* 7 6) oops)")));
+            SchemeList t = Eval(Parse("(list (+ 1 1) (+ 2 2) (* 2 3) (expt 2 3))"));
+            SchemeList e = new SchemeList(2.0);
+            e.ChainAppend(4.0).ChainAppend(6.0).ChainAppend(8.0);
+            Assert.True(t.Equals(e));
         }
+        
     }
 }
