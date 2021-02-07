@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-// TODO extend
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
 namespace CSharpLibraries.Interpreters
@@ -152,7 +151,21 @@ namespace CSharpLibraries.Interpreters
             }
 
             public Env Find(object variable)
-                => ContainsKey(variable) ? this : _outer.Find(variable);
+            {
+                return ContainsKey(variable) ? this : _outer.Find(variable);
+            }
+
+            public override string ToString()
+            {
+                var s = new StringBuilder();
+                foreach (KeyValuePair<object,dynamic> keyValuePair in this)
+                {
+                    s.Append($"[{keyValuePair.Key}:{keyValuePair.Value}]\n");
+                }
+
+                s.Remove(s.Length - 1, 1);
+                return s.ToString();
+            }
         }
 
         private const string Nil = "'()";
@@ -400,12 +413,12 @@ namespace CSharpLibraries.Interpreters
                     {
                         if (args.Count < 2) throw new ArgumentAmountException(">=2");
                         dynamic func = args[0];
-                        dynamic dArgs = args;
+                        dynamic lists = args.GetRange(1, args.Count-1);
                         var elements0 = new List<object>();
-                        for (int i = 1; i < dArgs.Count; i++)
+                        for (int i = 0; i < lists.Count; i++)
                         {
-                            elements0.Add(dArgs[i].Car);
-                            dArgs[i] = dArgs[i].Cdr;
+                            elements0.Add(lists[i].Car);
+                            lists[i] = lists[i].Cdr;
                         }
 
                         var r = new SchemeList(func(elements0));
@@ -413,16 +426,16 @@ namespace CSharpLibraries.Interpreters
                         while (true)
                         {
                             var elements = new List<object>();
-                            for (int i = 1; i < dArgs.Count; i++)
+                            for (int i = 0; i < lists.Count; i++)
                             {
-                                if (dArgs[i] != ".()")
+                                if (!lists[i].Equals("'()"))
                                 {
-                                    elements.Add(dArgs[i].Car);
-                                    dArgs[i] = dArgs[i].Cdr;
+                                    elements.Add(lists[i].Car);
+                                    lists[i] = lists[i].Cdr;
                                 }
                             }
 
-                            if (elements.Count == args.Count - 1)
+                            if (elements.Count == lists.Count)
                             {
                                 p = p.ChainAppend(func(elements));
                             }
@@ -507,7 +520,7 @@ namespace CSharpLibraries.Interpreters
                     })
                 },
                 {
-                    "'()",
+                    "nil",
                     Nil
                 }
             };
@@ -568,7 +581,7 @@ namespace CSharpLibraries.Interpreters
             while (true)
             {
                 var s = ReadLine(prompt);
-                if (s == "")
+                if (s.Equals(""))
                 {
                     continue;
                 }
@@ -592,7 +605,7 @@ namespace CSharpLibraries.Interpreters
 
         private delegate dynamic Lambda(List<object> args);
         
-        private static string ReadLine(string prompt = "lis.py>>>")
+        private static string ReadLine(string prompt)
         {
             Console.Write(prompt);
             return Console.ReadLine();
