@@ -10,6 +10,7 @@ using System.Timers;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
+// TODO optimization
 namespace CSharpLibraries.Interpreters
 {
     public static class Scheme
