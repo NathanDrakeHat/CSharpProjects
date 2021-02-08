@@ -44,7 +44,7 @@ namespace CSharpLibrariesTest.Interpreters
         {
             SchemeList t = RunScheme("(list (+ 1 1) (+ 2 2) (* 2 3) (expt 2 3))");
             SchemeList e = new SchemeList(2.0);
-            e.ChainAppend(4.0).ChainAppend(6.0).ChainAppend(8.0);
+            e.ChainAdd(4.0).ChainAdd(6.0).ChainAdd(8.0);
             Assert.True(t.Equals(e));
         }
 
@@ -76,7 +76,7 @@ namespace CSharpLibrariesTest.Interpreters
         public static void CaseTest7()
         {
             SchemeList l = new SchemeList(1.0);
-            l.ChainAppend(4.0).ChainAppend(9.0).ChainAppend(16.0);
+            l.ChainAdd(4.0).ChainAdd(9.0).ChainAdd(16.0);
             Assert.AreEqual(l, RunScheme("(begin " +
                                          "(define square (lambda (x) (* x x))) " +
                                          "(define range (lambda (a b) (if (= a b) nil (cons a (range (+ a 1) b))))) " +
@@ -87,11 +87,20 @@ namespace CSharpLibrariesTest.Interpreters
         public static void CaseTest8()
         {
             SchemeList e = new SchemeList(4.0);
-            e.ChainAppend(6.0).ChainAppend(8.0).ChainAppend(10.0);
+            e.ChainAdd(6.0).ChainAdd(8.0).ChainAdd(10.0);
             Assert.AreEqual(e,RunScheme("(begin " +
                                         "(define two (lambda (a b) (+ a b 2))) " +
                                         "(define l (list 1 2 3 4)) " +
                                         "(map two l l))"));
+        }
+
+        [Test]
+        public static void CaseTest9()
+        {
+            var l = new SchemeList(1);
+            l.ChainAdd(2).ChainAdd(3).ChainAdd(4).ChainAdd(5).ChainAdd(6);
+            SchemeList r = RunScheme("(append (list 1 2) (list 3 4) (list 5 6))");
+            Assert.AreEqual(l, r);
         }
     }
 }

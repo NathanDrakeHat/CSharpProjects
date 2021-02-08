@@ -2,9 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Timers;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
@@ -33,8 +35,6 @@ namespace CSharpLibraries.Interpreters
                 
             }
         }
-        
-        public static readonly Env GlobalEnv = StandardEnv();
 
         internal sealed record SchemeList : IEnumerable<object>
         {
@@ -66,12 +66,11 @@ namespace CSharpLibraries.Interpreters
                     {
                         r += Cdr.Count + 1;
                     }
-
+            
                     return r;
                 }
             }
-
-
+            
             public SchemeList(object o)
             {
                 Car = o;
@@ -89,7 +88,7 @@ namespace CSharpLibraries.Interpreters
             /// </summary>
             /// <param name="o">object</param>
             /// <returns>cdr</returns>
-            public SchemeList ChainAppend(object o)
+            public SchemeList ChainAdd(object o)
             {
                 if (!(o is SchemeList))
                 {
@@ -98,8 +97,26 @@ namespace CSharpLibraries.Interpreters
                 }
                 else
                 {
-                    Cdr = o;
-                    return Cdr;
+                    throw new InvalidCastException();
+                }
+            }
+
+            public void Append(object other)
+            {
+                if (other is SchemeList)
+                {
+                    if (Cdr.Equals(Nil))
+                    {
+                        Cdr = other;
+                    }
+                    else
+                    {
+                        Cdr.Append(other);
+                    }
+                }
+                else
+                {
+                    throw new InvalidCastException();
                 }
             }
 
@@ -169,6 +186,10 @@ namespace CSharpLibraries.Interpreters
         }
 
         private const string Nil = "'()";
+        
+        private delegate dynamic Lambda(List<object> args);
+        
+        private static readonly Env GlobalEnv = StandardEnv();
 
         private static Env StandardEnv()
         {
@@ -302,7 +323,7 @@ namespace CSharpLibraries.Interpreters
                         for (int i = 0; i < args.Count - 1; i++)
                         {
                             dynamic list = args[i];
-                            dynamic list1 = args[i + 1];
+                            var list1 = args[i + 1];
                             list.Append(list1);
                         }
 
@@ -313,7 +334,7 @@ namespace CSharpLibraries.Interpreters
                     "apply", new Lambda(args =>
                     {
                         dynamic proc = args[0];
-                        return proc(args);
+                        return proc(args.GetRange(1, args.Count - 1));
                     })
                 },
                 {"begin", new Lambda(args => args[^1])},
@@ -350,7 +371,7 @@ namespace CSharpLibraries.Interpreters
                     "eq?", new Lambda(args =>
                     {
                         if (args.Count != 2) throw new ArgumentAmountException("2");
-                        return args[0].Equals(args[1]);
+                        return ReferenceEquals(args[0],args[1]);
                     })
                 },
                 {
@@ -373,15 +394,8 @@ namespace CSharpLibraries.Interpreters
                     "length", new Lambda(args =>
                     {
                         if (args.Count != 1) throw new ArgumentAmountException("1");
-                        int len = 1;
-                        dynamic ptr = args[0];
-                        while (!ptr.Cdr.Equals(Nil))
-                        {
-                            ptr = ptr.Cdr;
-                            len++;
-                        }
-
-                        return len;
+                        dynamic list = args[0];
+                        return list.Count;
                     })
                 },
                 {
@@ -395,7 +409,7 @@ namespace CSharpLibraries.Interpreters
                         var p = res;
                         for (int i = 1; i < args.Count; i++)
                         {
-                            p = p.ChainAppend(args[i]);
+                            p = p.ChainAdd(args[i]);
                         }
 
                         return res;
@@ -437,7 +451,7 @@ namespace CSharpLibraries.Interpreters
 
                             if (elements.Count == lists.Count)
                             {
-                                p = p.ChainAppend(func(elements));
+                                p = p.ChainAdd(func(elements));
                             }
                             else
                             {
@@ -492,7 +506,7 @@ namespace CSharpLibraries.Interpreters
                     {
                         if (args.Count != 1) throw new ArgumentAmountException("1");
                         var type = args[0].GetType();
-                        return type == typeof(Lambda) || type == typeof(Lambda);
+                        return type == typeof(Lambda);
                     })
                 },
                 {
@@ -529,6 +543,36 @@ namespace CSharpLibraries.Interpreters
         }
 
         public static dynamic RunScheme(string program) => Eval(Parse(program));
+        
+        public static void Repl(string prompt = "NScheme>")
+        {
+            var timer = new Stopwatch();
+            while (true)
+            {
+                var s = ReadLine(prompt);
+                if (s.Equals(""))
+                {
+                    continue;
+                }
+                dynamic val = null;
+                try
+                {
+                    timer.Reset();
+                    val = Eval(Parse(s));
+                    Console.WriteLine($"timer:{timer.ElapsedMilliseconds}ms");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"{e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+                }
+                if (val != null)
+                {
+                    Console.WriteLine(val);
+                }
+            }
+
+            // ReSharper disable once FunctionNeverReturns
+        }
 
         public static dynamic Parse(string program) => ParseTokens(Tokenize(program));
 
@@ -576,35 +620,6 @@ namespace CSharpLibraries.Interpreters
             }
         }
 
-        public static void Repl(string prompt = "NScheme>")
-        {
-            while (true)
-            {
-                var s = ReadLine(prompt);
-                if (s.Equals(""))
-                {
-                    continue;
-                }
-                dynamic val = null;
-                try
-                {
-                    val = Eval(Parse(s));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"{e.GetType().Name}: {e.Message}\n{e.StackTrace}");
-                }
-                if (val != null)
-                {
-                    Console.WriteLine(val);
-                }
-            }
-
-            // ReSharper disable once FunctionNeverReturns
-        }
-
-        private delegate dynamic Lambda(List<object> args);
-        
         private static string ReadLine(string prompt)
         {
             Console.Write(prompt);
