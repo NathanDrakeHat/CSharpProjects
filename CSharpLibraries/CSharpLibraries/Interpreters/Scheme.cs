@@ -557,7 +557,6 @@ namespace CSharpLibraries.Interpreters
         
         public static void Repl(string prompt = "NScheme>")
         {
-            var t = new Stopwatch();
             while (true)
             {
                 var s = ReadLine(prompt);
@@ -568,10 +567,7 @@ namespace CSharpLibraries.Interpreters
                 dynamic val = null;
                 try
                 {
-                    t.Reset();
-                    t.Start();
                     val = Eval(Parse(s));
-                    Console.WriteLine($"{t.ElapsedMilliseconds}ms");
                 }
                 catch (Exception e)
                 {
