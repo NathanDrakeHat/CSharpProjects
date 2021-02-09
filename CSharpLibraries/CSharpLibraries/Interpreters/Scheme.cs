@@ -6,11 +6,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Timers;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
-// TODO optimization
+// TODO more scheme
 namespace CSharpLibraries.Interpreters
 {
     public static class Scheme
@@ -37,7 +36,7 @@ namespace CSharpLibraries.Interpreters
             }
         }
 
-        internal sealed record SchemeList : IEnumerable<object>
+        internal sealed class SchemeList : IEnumerable<object>
         {
             private object _car;
             private object _cdr;
@@ -186,6 +185,22 @@ namespace CSharpLibraries.Interpreters
             }
         }
 
+        internal static class Symbol
+        {
+            internal static HashSet<string> Sym(string s, HashSet<string> table)
+            {
+                if (!table.Contains(s))
+                {
+                    table.Add(s);
+                }
+
+                return table;
+            }
+            
+            internal static string ToSymbol(string s) => s;
+            // TODO add symbols
+        }
+
         private const string Nil = "'()";
         
         private delegate dynamic Lambda(List<object> args);
@@ -200,7 +215,6 @@ namespace CSharpLibraries.Interpreters
                     "+", new Lambda(args =>
                     {
                         if (args.Count < 1) throw new ArgumentAmountException(">=2");
-                        double res = 0;
                         dynamic first = args[0];
                         if (args.Count == 1 && first < 0)
                         {
@@ -208,13 +222,13 @@ namespace CSharpLibraries.Interpreters
                         }
                         else
                         {
-                            for (int i = 0; i < args.Count; i++)
+                            return args.Aggregate((o1, o2) =>
                             {
-                                dynamic t = args[i];
-                                res += t;
-                            }
+                                dynamic a = o1;
+                                dynamic b = o2;
+                                return a + b;
+                            });
 
-                            return res;
                         }
                     })
                 },
@@ -242,14 +256,10 @@ namespace CSharpLibraries.Interpreters
                 {
                     "*", new Lambda(args =>
                     {
-                        if (args.Count <= 1) throw new ArgumentAmountException("> 1");
-                        double r = 1;
-                        foreach (dynamic i in args)
-                        {
-                            r *= i;
-                        }
-
-                        return r;
+                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        dynamic a = args[0];
+                        dynamic b = args[1];
+                        return a * b;
                     })
                 },
                 {
@@ -547,7 +557,7 @@ namespace CSharpLibraries.Interpreters
         
         public static void Repl(string prompt = "NScheme>")
         {
-            var timer = new Stopwatch();
+            var t = new Stopwatch();
             while (true)
             {
                 var s = ReadLine(prompt);
@@ -558,9 +568,10 @@ namespace CSharpLibraries.Interpreters
                 dynamic val = null;
                 try
                 {
-                    timer.Reset();
+                    t.Reset();
+                    t.Start();
                     val = Eval(Parse(s));
-                    Console.WriteLine($"timer:{timer.ElapsedMilliseconds}ms");
+                    Console.WriteLine($"{t.ElapsedMilliseconds}ms");
                 }
                 catch (Exception e)
                 {
@@ -653,7 +664,7 @@ namespace CSharpLibraries.Interpreters
                 case ")":
                     throw new ParseException("unexpected ')'");
                 default:
-                    return ConvertToAtom(token);
+                    return ToAtom(token);
             }
         }
 
@@ -675,7 +686,7 @@ namespace CSharpLibraries.Interpreters
             return res;
         }
 
-        private static dynamic ConvertToAtom(string x)
+        private static dynamic ToAtom(string x)
         {
             bool succ = int.TryParse(x, out int t);
             if (!succ)
