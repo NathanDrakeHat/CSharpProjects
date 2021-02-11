@@ -134,11 +134,11 @@ namespace CSharpLibraries.Algorithms.Structures
                 yield break;
             }
 
-            var stack = new Stack<Node>(); // stack is important to understand this algorithm
+            var stack = new Stack<Node>();
             bool poppedBefore = false;
             while (n != null)
             {
-                if (n.Left != _sentinel && !poppedBefore) // if popped before, walk to right
+                if (n.Left != _sentinel && !poppedBefore)
                 {
                     stack.Push(n);
                     n = n.Left;
