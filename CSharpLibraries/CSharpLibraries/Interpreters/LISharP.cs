@@ -1,11 +1,9 @@
 ﻿#nullable disable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using static CSharpLibraries.Interpreters.Env;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
@@ -13,11 +11,12 @@ using static CSharpLibraries.Interpreters.Env;
 // TODO more scheme
 namespace CSharpLibraries.Interpreters
 {
-    public static class Scheme
+    public static class LISharP
     {
         internal class ArgumentAmountException : Exception
         {
             private readonly string _number;
+
             public ArgumentAmountException(string a)
             {
                 _number = a;
@@ -31,13 +30,11 @@ namespace CSharpLibraries.Interpreters
 
         internal class ParseException : Exception
         {
-            public ParseException(string s) :base(s)
+            public ParseException(string s) : base(s)
             {
-                
             }
         }
 
-        
 
         internal static class Symbol
         {
@@ -50,20 +47,23 @@ namespace CSharpLibraries.Interpreters
 
                 return table;
             }
-            
+
             internal static string ToSymbol(string s) => s;
             // TODO add symbols
         }
 
         internal const string Nil = "'()";
-        
+
         internal static readonly Env GlobalEnv = StandardEnv();
-        
+
         public static object RunScheme(string program) => Eval(Parse(program));
-        
+
         public static void Repl(string prompt = "NScheme>")
         {
+#if DEBUG
             var w = new Stopwatch();
+#endif
+            
             while (true)
             {
                 var s = ReadLine(prompt);
@@ -71,17 +71,26 @@ namespace CSharpLibraries.Interpreters
                 {
                     continue;
                 }
+
                 object val = null;
                 try
                 {
+#if DEBUG
                     w.Restart();
+#endif
                     val = Eval(Parse(s));
-                    Console.WriteLine(w.ElapsedMilliseconds);
+#if DEBUG
+                    Console.WriteLine($"time:{w.ElapsedMilliseconds}ms");
+#endif
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+                    Console.WriteLine($"{e.GetType().Name}: {e.Message}\n");
+#if DEBUG
+                    Console.WriteLine(e.StackTrace);
+#endif
                 }
+
                 if (val != null)
                 {
                     Console.WriteLine(val);
@@ -94,7 +103,7 @@ namespace CSharpLibraries.Interpreters
         public static object Parse(string program) => ParseTokens(Tokenize(program));
 
         private static object Eval(object x) => Eval(x, GlobalEnv);
-        
+
         private static object Eval(object x, Env currentEnv)
         {
             if (x is string)
@@ -106,9 +115,9 @@ namespace CSharpLibraries.Interpreters
                 return x;
             }
 
-            List<object> list = (List<object>)x;
+            List<object> list = (List<object>) x;
             var op = list[0];
-            var args = list.GetRange(1, list.Count-1);
+            var args = list.GetRange(1, list.Count - 1);
 
             switch (op)
             {
@@ -116,24 +125,25 @@ namespace CSharpLibraries.Interpreters
                     object test = args[0];
                     object conseq = args[1];
                     object alt = args[2];
-                    object exp = (bool)Eval(test, currentEnv) ? conseq : alt;
-                    return Eval(exp,currentEnv);
+                    object exp = (bool) Eval(test, currentEnv) ? conseq : alt;
+                    return Eval(exp, currentEnv);
                 case "define":
                     object symbol = args[0];
                     object expression = args[1];
                     currentEnv[symbol] = Eval(expression, currentEnv);
                     return null;
                 case "lambda":
-                    IEnumerable<object> parameters = (IEnumerable<object>)args[0];
+                    IEnumerable<object> parameters = (IEnumerable<object>) args[0];
                     object body = args[1];
                     return new Lambda(arguments => Eval(body, new Env(parameters, arguments, currentEnv)));
                 default:
-                    Lambda proc = (Lambda)Eval(op, currentEnv);
+                    Lambda proc = (Lambda) Eval(op, currentEnv);
                     List<object> vals = new List<object>();
                     foreach (var arg in args)
                     {
-                        vals.Add(Eval(arg,currentEnv));
+                        vals.Add(Eval(arg, currentEnv));
                     }
+
                     return proc(vals);
             }
         }
