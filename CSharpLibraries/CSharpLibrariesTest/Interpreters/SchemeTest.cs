@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CSharpLibraries.Interpreters;
 using NUnit.Framework;
 using static CSharpLibraries.Interpreters.Scheme;
 
@@ -30,19 +31,21 @@ namespace CSharpLibrariesTest.Interpreters
         [Test]
         public static void CaseTest1()
         {
-            Assert.AreEqual(314.1592653589793,RunScheme("(begin (define r 10) (* pi (* r r)))"));
+            var res = RunScheme("(begin (define r 10) (* pi (* r r)))");
+            Assert.AreEqual(314.1592653589793,res);
         }
 
         [Test]
         public static void CaseTest2()
         {
-            Assert.AreEqual(42, RunScheme("(if (> (* 11 11) 120) (* 7 6) oops)"));
+            var res = RunScheme("(if (> (* 11 11) 120) (* 7 6) oops)");
+            Assert.AreEqual(42, res);
         }
 
         [Test]
         public static void CaseTest3()
         {
-            SchemeList t = RunScheme("(list (+ 1 1) (+ 2 2) (* 2 3) (expt 2 3))");
+            SchemeList t = (SchemeList)RunScheme("(list (+ 1 1) (+ 2 2) (* 2 3) (expt 2 3))");
             SchemeList e = new SchemeList(2);
             e.ChainAdd(4).ChainAdd(6).ChainAdd(8);
             Assert.AreEqual(e,t);
@@ -51,17 +54,19 @@ namespace CSharpLibrariesTest.Interpreters
         [Test]
         public static void CaseTest4()
         {
-            Assert.AreEqual(120, RunScheme("(begin " +
-                                             "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) " +
-                                             "(fact 5))"));
+            var res = RunScheme("(begin " +
+                                "(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1)))))) " +
+                                "(fact 5))");
+            Assert.AreEqual(120, res);
         }
 
         [Test]
         public static void CaseTest5()
         {
-            Assert.AreEqual(13, RunScheme("(begin " +
-                                          "(define fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2)))))) " +
-                                          "(fib 6))"));
+            var res = RunScheme("(begin " +
+                                "(define fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2)))))) " +
+                                "(fib 6))");
+            Assert.AreEqual(13, res);
         }
 
         [Test]
@@ -99,7 +104,7 @@ namespace CSharpLibrariesTest.Interpreters
         {
             var l = new SchemeList(1);
             l.ChainAdd(2).ChainAdd(3).ChainAdd(4).ChainAdd(5).ChainAdd(6);
-            SchemeList r = RunScheme("(append (list 1 2) (list 3 4) (list 5 6))");
+            SchemeList r = (SchemeList)RunScheme("(append (list 1 2) (list 3 4) (list 5 6))");
             Assert.AreEqual(l, r);
         }
     }
