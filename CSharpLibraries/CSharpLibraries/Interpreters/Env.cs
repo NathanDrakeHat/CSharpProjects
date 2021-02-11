@@ -92,10 +92,8 @@ namespace CSharpLibraries.Interpreters
                 {
                     "*", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
-                        object a = args[0];
-                        object b = args[1];
-                        return Multiply(a,b);
+                        if (args.Count < 2) throw new ArgumentAmountException(">= 2");
+                        return args.Aggregate(Multiply);
                     })
                 },
                 {
