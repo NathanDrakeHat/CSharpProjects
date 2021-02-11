@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,56 +29,6 @@ namespace CSharpLibraries.Utils
             }
         }
         
-        /// <summary>
-        /// dynamic nested list(tree) to string<br/>
-        /// nested list should have same element type which should be the generic type<br/>
-        /// </summary>
-        /// <param name="nl">nested list</param>
-        /// <param name="start">start string builder</param>
-        /// <typeparam name="T">element to print</typeparam>
-        /// <returns>nested list with '[' and ']' split</returns>
-        public static string NestedToString<T>(this IEnumerable nl, StringBuilder? start = null)
-        {
-            StringBuilder res = new StringBuilder("[");
-            var enumerator = nl.GetEnumerator();
-            if (enumerator.MoveNext())
-            {
-                var current = enumerator.Current;
-                if (current != null && current.GetType() == typeof(T))
-                { 
-                    res.Append(current);
-                }
-                else if (current is IEnumerable t)
-                {
-                    res.Append(NestedToString<T>(t, res));
-                }
-                else
-                { 
-                    res.Append(current);
-                }
-            }
-            while(enumerator.MoveNext())
-            {
-                var current = enumerator.Current;
-                if (current != null && current.GetType() == typeof(T))
-                { 
-                    res.Append(", ");
-                    res.Append(current);
-                }
-                else if (current is IEnumerable t)
-                {
-                    res.Append(", ");
-                    res.Append(NestedToString<T>(t, res));
-                }
-                else
-                {
-                    res.Append(", ");
-                    res.Append(current);
-                }
-            }
-            res.Append(']');
-            return res.ToString();
-        }
 
         public static string MatrixToString<T>(IEnumerable<IEnumerable<T>> m)
         {
