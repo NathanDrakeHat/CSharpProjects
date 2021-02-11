@@ -60,10 +60,8 @@ namespace CSharpLibrariesTest.Interpreters
         public static void CaseTest5()
         {
             Assert.AreEqual(13, RunScheme("(begin " +
-                                          "(define fib-two-helper (lambda (t) (list (+ (car t) (car (cdr t))) (car t) ) ) ) "+
-                                          "(define fib-two (lambda (n) (if (< n 2) (list 1 1) (fib-two-helper (fib-two (- n 1)))))) " +
-                                          "(define fib (lambda (n) (car (fib-two n)))) "+
-                                            "(fib 6))"));
+                                          "(define fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2)))))) " +
+                                          "(fib 6))"));
         }
 
         [Test]

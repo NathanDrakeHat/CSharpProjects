@@ -8,5 +8,5 @@
 	
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b32c8953_002Df2e6_002D40e2_002Db2d3_002Dbf0a773483e0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;CSharpLibrariesTest&amp;gt; #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;ProjectFile&gt;F46353FF-C23E-453A-826C-7F72C6FC0A93/d:Interpreters/f:SchemeTest.cs&lt;/ProjectFile&gt;&#xD;
+  &lt;Project Location="C:\Users\Nathan\JetbrainProjects\CSharpProjects\CSharpLibraries\CSharpLibrariesTest" Presentation="&amp;lt;CSharpLibrariesTest&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
