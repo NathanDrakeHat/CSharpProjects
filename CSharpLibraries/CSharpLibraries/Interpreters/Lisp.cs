@@ -1,9 +1,11 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.VisualBasic;
 using static CSharpLibraries.Interpreters.Env;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
@@ -11,7 +13,7 @@ using static CSharpLibraries.Interpreters.Env;
 // TODO more scheme
 namespace CSharpLibraries.Interpreters
 {
-    public static class LISharP
+    public partial class Lisp
     {
         internal class ArgumentAmountException : Exception
         {
@@ -28,7 +30,7 @@ namespace CSharpLibraries.Interpreters
             }
         }
 
-        internal class ParseException : Exception
+        private class ParseException : Exception
         {
             public ParseException(string s) : base(s)
             {
@@ -36,29 +38,13 @@ namespace CSharpLibraries.Interpreters
         }
 
 
-        internal static class Symbol
-        {
-            internal static HashSet<string> Sym(string s, HashSet<string> table)
-            {
-                if (!table.Contains(s))
-                {
-                    table.Add(s);
-                }
+        internal static readonly IList<object> Nil = new List<object>(0);
 
-                return table;
-            }
+        private readonly Env _globalEnv = StandardEnv();
 
-            internal static string ToSymbol(string s) => s;
-            // TODO add symbols
-        }
+        public object RunScheme(string program) => Eval(Parse(program));
 
-        internal const string Nil = "'()";
-
-        internal static readonly Env GlobalEnv = StandardEnv();
-
-        public static object RunScheme(string program) => Eval(Parse(program));
-
-        public static void Repl(string prompt = "NScheme>")
+        public void Repl(string prompt = "NScheme>")
         {
 #if DEBUG
             var w = new Stopwatch();
@@ -102,7 +88,7 @@ namespace CSharpLibraries.Interpreters
 
         public static object Parse(string program) => ParseTokens(Tokenize(program));
 
-        private static object Eval(object x) => Eval(x, GlobalEnv);
+        private object Eval(object x) => Eval(x, _globalEnv);
 
         private static object Eval(object x, Env currentEnv)
         {
@@ -138,11 +124,7 @@ namespace CSharpLibraries.Interpreters
                     return new Lambda(arguments => Eval(body, new Env(parameters, arguments, currentEnv)));
                 default:
                     Lambda proc = (Lambda) Eval(op, currentEnv);
-                    List<object> vals = new List<object>();
-                    foreach (var arg in args)
-                    {
-                        vals.Add(Eval(arg, currentEnv));
-                    }
+                    List<object> vals = args.Select(arg => Eval(arg, currentEnv)).ToList();
 
                     return proc(vals);
             }
