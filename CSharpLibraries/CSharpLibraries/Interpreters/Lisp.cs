@@ -1,43 +1,19 @@
 ﻿#nullable disable
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using static CSharpLibraries.Interpreters.InterpretersExceptions;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Microsoft.VisualBasic;
 using static CSharpLibraries.Interpreters.Env;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
-// TODO more scheme
 namespace CSharpLibraries.Interpreters
 {
-    public partial class Lisp
+    public sealed class Lisp
     {
-        internal class ArgumentAmountException : Exception
-        {
-            private readonly string _number;
-
-            public ArgumentAmountException(string a)
-            {
-                _number = a;
-            }
-
-            public override string ToString()
-            {
-                return $"expected: {_number}";
-            }
-        }
-
-        private class ParseException : Exception
-        {
-            public ParseException(string s) : base(s)
-            {
-            }
-        }
-
-
+        
         internal static readonly IList<object> Nil = new List<object>(0);
 
         private readonly Env _globalEnv = StandardEnv();
@@ -109,9 +85,9 @@ namespace CSharpLibraries.Interpreters
             {
                 case "if":
                     object test = args[0];
-                    object conseq = args[1];
+                    object conSeq = args[1];
                     object alt = args[2];
-                    object exp = (bool) Eval(test, currentEnv) ? conseq : alt;
+                    object exp = (bool) Eval(test, currentEnv) ? conSeq : alt;
                     return Eval(exp, currentEnv);
                 case "define":
                     object symbol = args[0];
@@ -141,10 +117,10 @@ namespace CSharpLibraries.Interpreters
         /// </summary>
         /// <param name="tokens">list of tokens</param>
         /// <returns></returns>
-        /// <exception cref="ParseException"></exception>
+        /// <exception cref="SyntaxException"></exception>
         private static object ParseTokens(Queue<string> tokens)
         {
-            if (tokens.Count == 0) throw new ParseException("unexpected EOF");
+            if (tokens.Count == 0) throw new SyntaxException("unexpected EOF");
             var token = tokens.Dequeue();
             switch (token)
             {
@@ -160,7 +136,7 @@ namespace CSharpLibraries.Interpreters
                     return l;
                 }
                 case ")":
-                    throw new ParseException("unexpected ')'");
+                    throw new SyntaxException("unexpected ')'");
                 default:
                     return ToAtom(token);
             }

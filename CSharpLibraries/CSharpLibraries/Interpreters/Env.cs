@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using static CSharpLibraries.Interpreters.Lisp;
 using static CSharpLibraries.Interpreters.NumericOperators;
+using static CSharpLibraries.Interpreters.InterpretersExceptions;
 
 namespace CSharpLibraries.Interpreters
 {
@@ -50,7 +51,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "+", new Lambda(args =>
                     {
-                        if (args.Count < 1) throw new ArgumentAmountException(">=2");
+                        if (args.Count < 1) throw new ArgumentsCountException(">=2");
                         object first = args[0];
                         if (args.Count == 1 && LessThan(first, 0))
                         {
@@ -85,21 +86,21 @@ namespace CSharpLibraries.Interpreters
                                 object second = args[1];
                                 return Minus(first,second);
                             default:
-                                throw new ArgumentAmountException("1 or 2");
+                                throw new ArgumentsCountException("1 or 2");
                         }
                     })
                 },
                 {
                     "*", new Lambda(args =>
                     {
-                        if (args.Count < 2) throw new ArgumentAmountException(">= 2");
+                        if (args.Count < 2) throw new ArgumentsCountException(">= 2");
                         return args.Aggregate(Multiply);
                     })
                 },
                 {
                     "/", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         object a = args[0];
                         object b = args[1];
                         return Divide(a,b);
@@ -108,7 +109,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     ">", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         object a = args[0];
                         object b = args[1];
                         return LessThan(b,a);
@@ -117,7 +118,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "<", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         object a = args[0];
                         object b = args[1];
                         return LessThan(a,b);
@@ -126,7 +127,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     ">=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
 
                         object a = args[0];
                         object b = args[1];
@@ -136,7 +137,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "<=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
 
                         object a = args[0];
                         object b = args[1];
@@ -146,7 +147,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "=", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         object a = args[0];
                         object b = args[1];
                         return Equal(a,b);
@@ -155,7 +156,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "abs", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         object res = args[0];
                         if (LessThan(res,0)) return Negative(res);
                         else return res;
@@ -164,7 +165,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "append", new Lambda(args =>
                     {
-                        if (args.Count < 2) throw new ArgumentAmountException(">=2");
+                        if (args.Count < 2) throw new ArgumentsCountException(">=2");
                         for (int i = 0; i < args.Count - 1; i++)
                         {
                             SchemeList list = (SchemeList)args[i];
@@ -186,21 +187,21 @@ namespace CSharpLibraries.Interpreters
                 {
                     "car", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return ((SchemeList) args[0]).Car;
                     })
                 },
                 {
                     "cdr", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return ((SchemeList) args[0]).Cdr;
                     })
                 },
                 {
                     "cons", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         if (args[0] is SchemeList s)
                         {
                             s.Cdr = args[1];
@@ -215,14 +216,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "eq?", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         return ReferenceEquals(args[0],args[1]);
                     })
                 },
                 {
                     "expt", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         var a = Value(args[0]);
                         var b = Value(args[1]);
                         return Math.Pow(a, b);
@@ -231,14 +232,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "equal?", new Lambda(args =>
                     {
-                        if (args.Count != 2) throw new ArgumentAmountException("2");
+                        if (args.Count != 2) throw new ArgumentsCountException("2");
                         return args[0].Equals(args[1]);
                     })
                 },
                 {
                     "length", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         SchemeList list = (SchemeList)args[0];
                         return list.Count;
                     })
@@ -263,14 +264,14 @@ namespace CSharpLibraries.Interpreters
                 {
                     "list?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return args[0] is SchemeList;
                     })
                 },
                 {
                     "map", new Lambda(args =>
                     {
-                        if (args.Count < 2) throw new ArgumentAmountException(">=2");
+                        if (args.Count < 2) throw new ArgumentsCountException(">=2");
                         Lambda func = (Lambda)args[0];
                         var lists = args.GetRange(1, args.Count-1);
                         var elements0 = new List<object>();
@@ -312,21 +313,21 @@ namespace CSharpLibraries.Interpreters
                 {
                     "not", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return !(bool) args[0];
                     })
                 },
                 {
                     "null?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return args[0].Equals(Nil);
                     })
                 },
                 {
                     "number?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         object type = args[0].GetType();
                         return type.Equals(typeof(int)) || type.Equals(typeof(double));
                     })
@@ -349,7 +350,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "procedure?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         var type = args[0].GetType();
                         return type == typeof(Lambda);
                     })
@@ -357,7 +358,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "round", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         var a = Value(args[0]);
                         return Math.Round(a, MidpointRounding.AwayFromZero);
                     })
@@ -365,7 +366,7 @@ namespace CSharpLibraries.Interpreters
                 {
                     "symbol?", new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return args[0] is string;
                     })
                 },
@@ -374,7 +375,7 @@ namespace CSharpLibraries.Interpreters
                     "quote",
                     new Lambda(args =>
                     {
-                        if (args.Count != 1) throw new ArgumentAmountException("1");
+                        if (args.Count != 1) throw new ArgumentsCountException("1");
                         return args[0];
                     })
                 },
