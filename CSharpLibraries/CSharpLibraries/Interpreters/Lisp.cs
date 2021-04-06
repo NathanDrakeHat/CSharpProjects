@@ -195,21 +195,17 @@ namespace CSharpLibraries.Interpreters
 
         static bool ObjectIsTrue(object o)
         {
-            if (o is bool b)
+            switch (o)
             {
-                return b;
-            }
-            else if (o == null)
-            {
-                return false;
-            }
-            else if (o is int || o is double)
-            {
-                return !o.Equals(0);
-            }
-            else
-            {
-                throw new SyntaxException("not bool");
+                case bool b:
+                    return b;
+                case null:
+                    return false;
+                case int:
+                case double:
+                    return !o.Equals(0);
+                default:
+                    throw new SyntaxException("not bool");
             }
         }
     }
