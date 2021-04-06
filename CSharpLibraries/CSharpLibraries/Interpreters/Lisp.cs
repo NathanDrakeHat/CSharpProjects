@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using static CSharpLibraries.Interpreters.InterpretersExceptions;
 using System.Diagnostics;
@@ -13,7 +14,6 @@ namespace CSharpLibraries.Interpreters
 {
     public sealed class Lisp
     {
-        
         internal static readonly IList<object> Nil = new List<object>(0);
 
         private readonly Env _globalEnv = StandardEnv();
@@ -25,7 +25,7 @@ namespace CSharpLibraries.Interpreters
 #if DEBUG
             var w = new Stopwatch();
 #endif
-            
+
             while (true)
             {
                 var s = ReadLine(prompt);
@@ -178,6 +178,38 @@ namespace CSharpLibraries.Interpreters
             else
             {
                 return t;
+            }
+        }
+
+        internal static bool ObjectIsNil(object o)
+        {
+            if (o is List<object> l)
+            {
+                return l.Count == 0;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        static bool ObjectIsTrue(object o)
+        {
+            if (o is bool b)
+            {
+                return b;
+            }
+            else if (o == null)
+            {
+                return false;
+            }
+            else if (o is int || o is double)
+            {
+                return !o.Equals(0);
+            }
+            else
+            {
+                throw new SyntaxException("not bool");
             }
         }
     }
