@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -44,7 +45,7 @@ namespace CSharpLibraries.Interpreters{
             if (ContainsKey(variable)){
                 return this;
             }
-            else if (variable == null){
+            else if (_outer == null){
                 throw new LookUpException(variable.ToString());
             }
             else{
@@ -65,7 +66,7 @@ namespace CSharpLibraries.Interpreters{
         internal static Environment NewStandardEnv(){
             var d = new List<DictionaryEntry>(){
                 new(
-                    "+", new Lambda(args => {
+                    new Symbol("+"), new Lambda(args => {
                         if (args.Count < 1) throw new ArgumentsCountException(">=2");
 
                         if (args.Count == 1){
@@ -85,7 +86,7 @@ namespace CSharpLibraries.Interpreters{
                         }
                     })
                 ),
-                new("-", new Lambda(args => {
+                new(new Symbol("-"), new Lambda(args => {
                     object first = args[0];
                     switch (args.Count){
                         case 1:
@@ -101,54 +102,54 @@ namespace CSharpLibraries.Interpreters{
                             throw new ArgumentsCountException("1 or 2");
                     }
                 })),
-                new("*", new Lambda(args => {
+                new(new Symbol("*"), new Lambda(args => {
                     if (args.Count < 2) throw new ArgumentsCountException(">= 2");
                     return args.Aggregate(Multiply);
                 })),
                 new(
-                    "/", new Lambda(args => {
+                    new Symbol("/"), new Lambda(args => {
                         if (args.Count < 2) throw new ArgumentsCountException("2");
                         return args.Aggregate(Divide);
                     })),
-                new(">", new Lambda(args => {
+                new(new Symbol(">"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     object a = args[0];
                     object b = args[1];
                     return LessThan(b, a);
                 })),
-                new("<", new Lambda(args => {
+                new(new Symbol("<"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     object a = args[0];
                     object b = args[1];
                     return LessThan(a, b);
                 })),
-                new(">=", new Lambda(args => {
+                new(new Symbol(">="), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
 
                     object a = args[0];
                     object b = args[1];
                     return LessThan(b, a) || ValueEqual(a, b);
                 })),
-                new("<=", new Lambda(args => {
+                new(new Symbol("<="), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
 
                     object a = args[0];
                     object b = args[1];
                     return LessThan(a, b) || ValueEqual(a, b);
                 })),
-                new("=", new Lambda(args => {
+                new(new Symbol("="), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     object a = args[0];
                     object b = args[1];
                     return ValueEqual(a, b);
                 })),
-                new("abs", new Lambda(args => {
+                new(new Symbol("abs"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     object res = args[0];
                     if (LessThan(res, 0)) return Negative(res);
                     else return res;
                 })),
-                new("append", new Lambda(args => {
+                new(new Symbol("append"), new Lambda(args => {
                     if (args.Count < 2) throw new ArgumentsCountException(">=2");
                     IList<object> res = new List<object>((IList<object>) args[0]);
                     for (int i = 1; i < args.Count; i++){
@@ -157,20 +158,20 @@ namespace CSharpLibraries.Interpreters{
 
                     return res;
                 })),
-                new("apply", new Lambda(args => {
+                new(new Symbol("apply"), new Lambda(args => {
                     Lambda proc = (Lambda) args[0];
                     return proc.Apply(args.Skip(1).ToList());
                 })),
-                new("begin", new Lambda(args => args[^1])),
-                new("car", new Lambda(args => {
+                new(new Symbol("begin"), new Lambda(args => args[^1])),
+                new(new Symbol("car"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return ((IList<object>) args[0])[0];
                 })),
-                new("cdr", new Lambda(args => {
+                new(new Symbol("cdr"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return ((IList<object>) args[0]).Skip(1).ToList();
                 })),
-                new("cons", new Lambda(args => {
+                new(new Symbol("cons"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     var content = (IList<object>) args[1];
                     IList<object> t = new List<object>(content.Count + 1);
@@ -178,25 +179,25 @@ namespace CSharpLibraries.Interpreters{
                     t.AddRange(content);
                     return t;
                 })),
-                new("eq?", new Lambda(args => {
+                new(new Symbol("eq?"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     return ReferenceEquals(args[0], args[1]);
                 })),
-                new("expt", new Lambda(args => {
+                new(new Symbol("expt"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     var a = Value(args[0]);
                     var b = Value(args[1]);
                     return Math.Pow(a, b);
                 })),
-                new("equal?", new Lambda(args => {
+                new(new Symbol("equal?"), new Lambda(args => {
                     if (args.Count != 2) throw new ArgumentsCountException("2");
                     return args[0].Equals(args[1]);
                 })),
-                new("length", new Lambda(args => {
+                new(new Symbol("length"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return ((IList<object>) args[0]).Count;
                 })),
-                new("list", new Lambda(args => {
+                new(new Symbol("list"), new Lambda(args => {
                     if (args.Count < 1){
                         return new SchemeList(Nil);
                     }
@@ -209,11 +210,11 @@ namespace CSharpLibraries.Interpreters{
 
                     return res;
                 })),
-                new("list?", new Lambda(args => {
+                new(new Symbol("list?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return new List<object>(args);
                 })),
-                new("map", new Lambda(args => {
+                new(new Symbol("map"), new Lambda(args => {
                     if (args.Count < 2) throw new ArgumentsCountException(">=2");
                     Lambda func = (Lambda) args[0];
                     var lists = args.Skip(1).ToList();
@@ -236,21 +237,21 @@ namespace CSharpLibraries.Interpreters{
 
                     return r;
                 })),
-                new("max", new Lambda(args => args.Max())),
-                new("min", new Lambda(args => args.Min())),
-                new("not", new Lambda(args => {
+                new(new Symbol("max"), new Lambda(args => args.Max())),
+                new(new Symbol("min"), new Lambda(args => args.Min())),
+                new(new Symbol("not"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return !(bool) args[0];
                 })),
-                new("null?", new Lambda(args => {
+                new(new Symbol("null?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return ObjectIsNil(args[0]);
                 })),
-                new("number?", new Lambda(args => {
+                new(new Symbol("number?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return (args[0] is int) || (args[0] is double) || (args[0] is Complex);
                 })),
-                new("print", new Lambda(args => {
+                new(new Symbol("print"), new Lambda(args => {
                     if (args.Count != 1){
                         throw new ArgumentsCountException("1");
                     }
@@ -259,22 +260,105 @@ namespace CSharpLibraries.Interpreters{
 
                     return null;
                 })),
-                new("procedure?", new Lambda(args => {
+                new(new Symbol("procedure?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return args[0] is Procedure;
                 })),
-                new("round", new Lambda(args => {
+                new(new Symbol("round"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     var a = Value(args[0]);
                     return Math.Round(a, MidpointRounding.AwayFromZero);
                 })),
-                new("symbol?", new Lambda(args => {
+                new(new Symbol("symbol?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return args[0] is Symbol;
                 })),
-                new("pi", Math.PI),
-                new("nil",
-                    Nil)
+                new(new Symbol("pi"), Math.PI),
+                new(new Symbol("nil"),
+                    Nil),
+                new(
+                    new Symbol("boolean?"),
+                    new Lambda(
+                        args => {
+                            if (args.Count != 1){
+                                throw new ArgumentsCountException("1");
+                            }
+
+                            return args[0] is bool;
+                        })
+                ),
+                new(new Symbol("port?"),
+                    new Lambda(args => {
+                        if (args.Count != 1){
+                            throw new ArgumentsCountException("1");
+                        }
+
+                        return args[0] is FileInfo;
+                    })),
+                new(new Symbol("call/cc"), new Lambda(args => {
+                    if (args.Count != 1){
+                        throw new ArgumentsCountException("1");
+                    }
+
+                    return Callcc((Lambda) args[0]);
+                })),
+                new(new Symbol("sqrt"), new Lambda(args => {
+                    if (args.Count != 1){
+                        throw new ArgumentsCountException("1");
+                    }
+
+                    var t = args[0];
+                    if (t is int i){
+                        if (i >= 0){
+                            return Math.Sqrt(i);
+                        }
+                        else{
+                            Complex c = new Complex(i, 0);
+                            return Complex.Sqrt(c);
+                        }
+                    }
+                    else if (t is double d1){
+                        if (d1 >= 0){
+                            return Math.Sqrt(d1);
+                        }
+                        else{
+                            Complex c = new Complex(d1, 0);
+                            return Complex.Sqrt(c);
+                        }
+                    }
+                    else if (t is Complex c){
+                        return Complex.Sqrt(c);
+                    }
+                    else{
+                        throw new SyntaxException(EvalToString(t) + " is not number");
+                    }
+                })),
+
+                new(new Symbol("display"), new Lambda(
+                    args => {
+                        if (args.Count != 1){
+                            throw new ArgumentsCountException("1");
+                        }
+
+                        Console.WriteLine(EvalToString(args[0]));
+                        return null;
+                    })),
+                new(new Symbol("port?"), new Lambda(
+                    args => {
+                        if (args.Count != 1){
+                            throw new ArgumentsCountException("1");
+                        }
+
+                        if (args[0] is string){
+                            return new FileInfo((string) args[0]).Exists;
+                        }
+                        else if (args[0] is Symbol){
+                            return new FileInfo(((Symbol) args[0]).Value).Exists;
+                        }
+                        else{
+                            throw new Exception("unknown error");
+                        }
+                    }))
             };
             return new Environment(d);
         }
