@@ -1,31 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpLibraries.Interpreters;
 using NUnit.Framework;
-using static CSharpLibraries.Interpreters.Lisp;
 
 namespace CSharpLibrariesTest.Interpreters{
-    public static class SchemeTest{
+    public static class LispTest{
         private static readonly Lisp Interpreter = new();
 
         [Test]
         public static void ParseTest(){
+            var res = Interpreter.Parse("(begin (define r 10) (* pi (* r r)))");
             Assert.AreEqual(new List<object>{
-                "begin",
+                new Symbol("begin"),
                 new List<object>{
-                    "define", "r", 10
+                    new Symbol("define"), new Symbol("r"), 10
                 },
                 new List<object>{
-                    "*", "pi",
+                    new Symbol("*"), new Symbol("pi"),
                     new List<object>{
-                        "*", "r", "r"
+                        new Symbol("*"), new Symbol("r"), new Symbol("r")
                     }
                 }
-            }, Interpreter.Parse("(begin (define r 10) (* pi (* r r)))"));
+            }, res);
         }
 
         [Test]
         public static void CaseTest1(){
             var res = Interpreter.EvalScripts("(begin (define r 10) (* pi (* r r)))");
+            Console.WriteLine(res);
             Assert.AreEqual(314.1592653589793, res);
         }
 

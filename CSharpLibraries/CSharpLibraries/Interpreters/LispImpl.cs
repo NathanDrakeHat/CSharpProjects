@@ -57,7 +57,7 @@ namespace CSharpLibraries.Interpreters{
                 });
         }
 
-        static void LoadLib(string fileName, Lisp interpreter){
+        private static void LoadLib(string fileName, Lisp interpreter){
             var file = new FileInfo(fileName);
             var inPort = new InputPort(file);
             while (true){
@@ -73,20 +73,24 @@ namespace CSharpLibraries.Interpreters{
                     Eval(x, interpreter._globalEnv);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.StackTrace);
+                    Console.Error.WriteLineAsync(e.StackTrace).Wait();
                 }
             }
         }
-
-
+        
+        private void EvalAndPrint(object x) {
+            var val = Eval(x, _globalEnv);
+            if (val != null) {
+                Console.Out.WriteLineAsync(EvalToString(val)).Wait();
+            }
+        }
+        
         internal static readonly IList<object> Nil = new List<object>(0);
 
         private readonly Environment _globalEnv = NewStandardEnv();
 
         private readonly Dictionary<Symbol, Lambda> macro_table;
-
-        public object Parse(string program) => ParseTokens(Tokenize(program));
-
+        
         internal object Parse(object inPort){
             return Parse(inPort, this);
         }
@@ -146,7 +150,7 @@ namespace CSharpLibraries.Interpreters{
                     return false;
                 default:{
                     if (x.StartsWith("\"") && x.EndsWith("\"")){
-                        return x.Substring(1, x.Length - 1);
+                        return x.Substring(1, x.Length - 2);
                     }
                     else if (x.ContainsDigit()){
                         if (int.TryParse(x, out int iX)){
@@ -212,20 +216,19 @@ namespace CSharpLibraries.Interpreters{
                     return new Procedure(vars, exp, currentEnv);
                 }
                 else if (op.Equals(SymBegin)){
-                    foreach (var exp in l.Take(1).ToList()) Eval(exp, currentEnv);
+                    foreach (var exp in l.Skip(1).ToList()) Eval(exp, currentEnv);
                     x = l[^1];
                 }
                 else{
-                    Environment finalEnv = currentEnv;
-                    IList<object> expression = l.Select(exp => Eval(exp, finalEnv)).ToList();
-                    var proc = expression[0];
-                    expression = expression.Take(1).ToList();
+                    IList<object> express = l.Select(exp => Eval(exp, currentEnv)).ToList();
+                    var proc = express[0];
+                    express = express.Skip(1).ToList();
                     if (proc is Procedure p){
                         x = p.Expression;
-                        currentEnv = new Environment(p.Parameters, expression, p.Environment);
+                        currentEnv = new Environment(p.Parameters, express, p.Environment);
                     }
                     else{
-                        return ((Lambda) proc).Apply(expression);
+                        return ((Lambda) proc).Apply(express);
                     }
                 }
             }
@@ -354,53 +357,10 @@ namespace CSharpLibraries.Interpreters{
         }
 
         private static string ReadLine(string prompt){
-            Console.Write(prompt);
+            Console.Out.WriteLineAsync(prompt).Wait();
             return Console.ReadLine();
         }
-
-        /// <summary>
-        /// tokens to string tree
-        /// </summary>
-        /// <param name="tokens">list of tokens</param>
-        /// <returns></returns>
-        /// <exception cref="SyntaxException"></exception>
-        private object ParseTokens(Queue<string> tokens){
-            if (tokens.Count == 0) throw new SyntaxException("unexpected EOF");
-            var token = tokens.Dequeue();
-            switch (token){
-                case "(":{
-                    var l = new List<object>();
-                    while (!tokens.Peek().Equals(")")){
-                        l.Add(ParseTokens(tokens));
-                    }
-
-                    tokens.Dequeue();
-                    return l;
-                }
-                case ")":
-                    throw new SyntaxException("unexpected ')'");
-                default:
-                    return ToAtom(token);
-            }
-        }
-
-        /// <summary>
-        /// string to list of tokens
-        /// </summary>
-        /// <param name="program">string</param>
-        /// <returns>tokens list</returns>
-        private Queue<string> Tokenize(string program){
-            var t = program.Replace("(", " ( ").Replace(")", " ) ").Split().ToList();
-            t.RemoveAll(s => s.Equals(""));
-            Queue<string> res = new Queue<string>();
-            foreach (var i in t){
-                res.Enqueue(i);
-            }
-
-            return res;
-        }
-
-
+        
         internal static string EvalToString(object x){
             if (x == null){
                 return null;
@@ -474,7 +434,7 @@ namespace CSharpLibraries.Interpreters{
             try{
                 bindings = (IList<IList<object>>) args[0];
             }
-            catch (InvalidCastException e){
+            catch (InvalidCastException){
                 throw new InvalidCastException("illegal binding list");
             }
 

@@ -42,6 +42,11 @@ namespace CSharpLibraries.Interpreters{
         }
 
         internal Environment Find(object variable){
+
+#if DEBUG
+            Console.Out.WriteLineAsync($"find symbol: <{variable}> in {variable.GetHashCode()}").Wait();
+#endif
+            
             if (ContainsKey(variable)){
                 return this;
             }
@@ -256,8 +261,7 @@ namespace CSharpLibraries.Interpreters{
                         throw new ArgumentsCountException("1");
                     }
 
-                    Console.WriteLine(EvalToString(args[0]));
-
+                    Console.Out.WriteLineAsync(EvalToString(args[0])).Wait();
                     return null;
                 })),
                 new(new Symbol("procedure?"), new Lambda(args => {
@@ -340,7 +344,7 @@ namespace CSharpLibraries.Interpreters{
                             throw new ArgumentsCountException("1");
                         }
 
-                        Console.WriteLine(EvalToString(args[0]));
+                        Console.Out.WriteLineAsync(EvalToString(args[0])).Wait();
                         return null;
                     })),
                 new(new Symbol("port?"), new Lambda(

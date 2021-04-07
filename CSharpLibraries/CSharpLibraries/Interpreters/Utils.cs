@@ -84,17 +84,17 @@ namespace CSharpLibraries.Interpreters{
 
         internal static object Multiply(object a, object b){
             return a switch{
-                int c when b is int e => c * e,
-                int c when b is double d => c * d,
-                int c when b is Complex cx => Complex.Multiply(c, cx),
+                int ia when b is int ib => ia * ib,
+                int ia when b is double db => ia * db,
+                int ia when b is Complex cb => Complex.Multiply(ia, cb),
                 int => throw new InvalidCastException(),
-                double e when b is int f => e * f,
-                double e when b is double d => e * d,
-                double e when b is Complex cx => Complex.Multiply(e, cx),
+                double da when b is int ib => da * ib,
+                double da when b is double db => da * db,
+                double da when b is Complex cb => Complex.Multiply(da, cb),
                 double => throw new InvalidCastException(),
-                Complex cx when b is int e => Complex.Multiply(cx, e),
-                Complex cx when b is double d => Complex.Multiply(cx, d),
-                Complex cx when b is Complex cx1 => Complex.Multiply(cx, cx1),
+                Complex ca when b is int ib => Complex.Multiply(ca, ib),
+                Complex ca when b is double db => Complex.Multiply(ca, db),
+                Complex ca when b is Complex cb => Complex.Multiply(ca, cb),
                 _ => throw new InvalidCastException()
             };
         }
