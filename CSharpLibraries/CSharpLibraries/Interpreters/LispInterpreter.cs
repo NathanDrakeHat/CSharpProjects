@@ -45,52 +45,128 @@ namespace CSharpLibraries.Interpreters{
 
         public object Parse(string program) => ParseTokens(Tokenize(program));
 
+        
+        private static object Read(InputPort inPort){
+            var token = inPort.NextToken();
+            return token.Equals(SymEof) ? SymEof : ReadAhead(token, inPort);
+        }
+        
+        private static object ReadAhead(object token, InputPort inPort){
+            if (token.Equals("(")){
+                IList<object> l = new List<object>();
+                while (true){
+                    token = inPort.NextToken();
+                    if (token.Equals(")")){
+                        return l;
+                    }
+                    else{
+                        l.Add(ReadAhead(token, inPort));
+                    }
+                }
+            }
+            else if (token.Equals(")")){
+                throw new SyntaxException("unexpected )");
+            }
+            else if (QuotesDict.ContainsKey((string) token)){
+                return new List<object>(){QuotesDict[(string)token], Read(inPort)};
+            }
+            else if (token.Equals(SymEof)){
+                throw new SyntaxException("unexpected EOF in list");
+            }
+            else{
+                return ToAtom((string) token);
+            }
+        }
+
+        private static object ToAtom(string x){
+            switch (x){
+                case "#t":
+                    return true;
+                case "#f":
+                    return false;
+                default:{
+                    if (x.StartsWith("\"") && x.EndsWith("\"")){
+                        return x.Substring(1, x.Length - 1);
+                    }
+                    else if (x.ContainsDigit()){
+                        if (int.TryParse(x, out int iX)){
+                            return iX;
+                        }
+                        else{
+                            if (double.TryParse(x, out double dX)){
+                                return dX;
+                            }
+                            else{
+                                if (Utils.TryParseImaginary(x, out Complex? cX)){
+                                    return cX;
+                                }
+                                else{
+                                    return new Symbol(x);
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        return new Symbol(x);
+                    }
+                }
+            }
+        }
 
         internal static object Eval(object x, Environment currentEnv){
             while (true){
-                if (x is Symbol) { return currentEnv.Find(x)[x]; }
-                else if (!(x is IList<object>)) { return x; }
+                if (x is Symbol){
+                    return currentEnv.Find(x)[x];
+                }
+                else if (!(x is IList<object>)){
+                    return x;
+                }
+
                 IList<object> l = (IList<object>) x;
                 var op = l[0];
-                if (op.Equals(SymQuote)) { return l[1]; }
-                else if (op.Equals(SymIf)) {
+                if (op.Equals(SymQuote)){
+                    return l[1];
+                }
+                else if (op.Equals(SymIf)){
                     var test = l[1];
                     var conseq = l[2];
                     var alt = l[3];
                     bool testBool = ObjectIsTrue(Eval(test, currentEnv));
                     x = testBool ? conseq : alt;
                 }
-                else if (op.Equals(SymSet)) {
+                else if (op.Equals(SymSet)){
                     var v = l[1];
                     var exp = l[2];
                     currentEnv.Find(v)[v] = Eval(exp, currentEnv);
                     return null;
                 }
-                else if (op.Equals(SymDefine)) {
+                else if (op.Equals(SymDefine)){
                     var v = l[1];
                     var exp = l[2];
-                    currentEnv[v] =  Eval(exp, currentEnv);
+                    currentEnv[v] = Eval(exp, currentEnv);
                     return null;
                 }
-                else if (op.Equals(SymLambda)) {
+                else if (op.Equals(SymLambda)){
                     var vars = l[1];
                     var exp = l[2];
                     return new Procedure(vars, exp, currentEnv);
                 }
-                else if (op.Equals(SymBegin)) {
+                else if (op.Equals(SymBegin)){
                     foreach (var exp in l.Take(1).ToList()) Eval(exp, currentEnv);
                     x = l[^1];
                 }
-                else {
+                else{
                     Environment finalEnv = currentEnv;
                     IList<object> expression = l.Select(exp => Eval(exp, finalEnv)).ToList();
                     var proc = expression[0];
                     expression = expression.Take(1).ToList();
-                    if (proc is Procedure p) {
+                    if (proc is Procedure p){
                         x = p.Expression;
                         currentEnv = new Environment(p.Parameters, expression, p.Environment);
                     }
-                    else { return ((Lambda) proc).Apply(expression); }
+                    else{
+                        return ((Lambda) proc).Apply(expression);
+                    }
                 }
             }
         }
@@ -142,21 +218,6 @@ namespace CSharpLibraries.Interpreters{
             return res;
         }
 
-        private object ToAtom(string x){
-            bool succ = int.TryParse(x, out int t);
-            if (!succ){
-                bool succ1 = double.TryParse(x, out double t1);
-                if (!succ1){
-                    return x;
-                }
-                else{
-                    return t1;
-                }
-            }
-            else{
-                return t;
-            }
-        }
 
         internal static string EvalToString(object x){
             if (x == null){
