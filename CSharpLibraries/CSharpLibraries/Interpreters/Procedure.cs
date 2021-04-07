@@ -8,7 +8,7 @@ namespace CSharpLibraries.Interpreters{
         internal readonly object Parameters;
 
         internal Procedure(object parameters, object expression, Environment env)
-            : base(args => LispInterpreter.Eval(expression, new Environment(parameters, args, env))){
+            : base(args => Lisp.Eval(expression, new Environment(parameters, args, env))){
             Environment = env;
             Expression = expression;
             Parameters = parameters;

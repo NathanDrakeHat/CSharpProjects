@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using static CSharpLibraries.Interpreters.LispInterpreter;
+using static CSharpLibraries.Interpreters.Lisp;
 using static CSharpLibraries.Interpreters.Utils;
 using static CSharpLibraries.Interpreters.InterpretersExceptions;
 

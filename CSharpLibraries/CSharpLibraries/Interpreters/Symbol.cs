@@ -49,7 +49,7 @@ namespace CSharpLibraries.Interpreters{
             {",@", SymUnquoteSplicing}
         };
 
-        internal static readonly Symbol SymbolAppend = new Symbol("append");
+        internal static readonly Symbol SymAppend = new Symbol("append");
         internal static readonly Symbol SymCons = new Symbol("cons");
         internal static readonly Symbol SymLet = new Symbol("let");
     }
