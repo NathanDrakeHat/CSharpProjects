@@ -6,15 +6,13 @@ using System.Runtime.CompilerServices;
 using static CSharpLibraries.Utils.Extension;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
-namespace CSharpLibraries.Algorithms.Structures
-{
-    
+
+namespace CSharpLibraries.Algorithms.Structures{
     // ReSharper disable once UnusedType.Global
-    public sealed class FibonacciHeap<TKey, TValue> where TValue : notnull
-    {
+    public sealed class FibonacciHeap<TKey, TValue> where TValue : notnull{
         #region InnerClass
-        internal sealed class Node
-        {
+
+        internal sealed class Node{
             internal TKey Key;
             internal readonly TValue Value;
             internal Node Parent;
@@ -24,8 +22,7 @@ namespace CSharpLibraries.Algorithms.Structures
             internal int Degree; // number of children
             internal bool Mark; // whether the node had lost a child when it be made another node's child
 
-            internal Node(TKey key, TValue val)
-            {
+            internal Node(TKey key, TValue val){
                 Key = key;
                 Value = val;
                 Left = this;
@@ -39,23 +36,20 @@ namespace CSharpLibraries.Algorithms.Structures
 
 
         internal Node RootList;
-        public int Count { get; internal set; } // number of nodes
+        public int Count{ get; internal set; } // number of nodes
         private readonly Dictionary<TValue, Node> _valueToNodeMap = new();
         private readonly Func<TKey, TKey, int> _keyComparer;
         private int UpperBound => (int) (Math.Log(Count) / Math.Log(2));
 
-        public FibonacciHeap(Func<TKey, TKey, int> keyComparer)
-        {
+        public FibonacciHeap(Func<TKey, TKey, int> keyComparer){
             _keyComparer = keyComparer ?? throw new ArgumentNullException(nameof(keyComparer));
         }
 
-        private void Insert(Node x)
-        {
+        private void Insert(Node x){
             Count++;
             _valueToNodeMap[x.Value] = x;
             if (RootList == null) RootList = x;
-            else
-            {
+            else{
                 AddNodeToList(x, RootList); // add x to root list
                 if (_keyComparer(x.Key, RootList.Key) < 0) RootList = x;
             }
@@ -64,16 +58,13 @@ namespace CSharpLibraries.Algorithms.Structures
         public void Insert(TKey key, TValue val) => Insert(new Node(key, val));
 
 
-        public TValue ExtractMin()
-        {
+        public TValue ExtractMin(){
             if (Count <= 0) throw new InvalidOperationException("Null heap.");
             var z = RootList;
             var childList = z!.ChildList; // add root_list's children list to root list
             var p = childList;
-            if (p != null)
-            {
-                do
-                {
+            if (p != null){
+                do{
                     var t = p.Right;
                     p.Parent = null;
                     AddNodeToList(p, RootList!);
@@ -90,24 +81,20 @@ namespace CSharpLibraries.Algorithms.Structures
             return z.Value;
         }
 
-        private void Consolidate()
-        {
+        private void Consolidate(){
             var array = new Node[UpperBound + 1];
             var w = RootList;
             if (w == null) return;
 
             var dict = new HashSet<Node>();
-            do
-            {
+            do{
                 // for w in root list start
                 var x = w; // x current node
                 var next = x.Right;
                 int d = x.Degree;
-                while (array[d] != null)
-                {
+                while (array[d] != null){
                     var y = array[d]; // y stored node
-                    if (_keyComparer(x.Key, y!.Key) > 0)
-                    {
+                    if (_keyComparer(x.Key, y!.Key) > 0){
                         // exchange pointer
                         var t = x;
                         x = y;
@@ -126,19 +113,15 @@ namespace CSharpLibraries.Algorithms.Structures
             } while (!dict.Contains(w));
 
             RootList = null;
-            for (int i = 0; i <= UpperBound; i++)
-            {
+            for (int i = 0; i <= UpperBound; i++){
                 var t = array[i];
-                if (t != null)
-                {
-                    if (RootList == null)
-                    {
+                if (t != null){
+                    if (RootList == null){
                         t.Right = t;
                         t.Left = t;
                         RootList = t;
                     }
-                    else
-                    {
+                    else{
                         AddNodeToList(t, RootList);
                         if (_keyComparer(t.Key, RootList.Key) < 0) RootList = t;
                     }
@@ -147,10 +130,9 @@ namespace CSharpLibraries.Algorithms.Structures
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
-        public FibonacciHeap<TKey, TValue> Union(FibonacciHeap<TKey, TValue> f2)
-        {
+        public FibonacciHeap<TKey, TValue> Union(FibonacciHeap<TKey, TValue> f2){
             f2.RequireNotNullArg(nameof(f2));
-            var res = new FibonacciHeap<TKey, TValue>(_keyComparer) {RootList = RootList};
+            var res = new FibonacciHeap<TKey, TValue>(_keyComparer){RootList = RootList};
             var f1Right = RootList!.Right; // concatenate two root list
             var f2Left = f2.RootList!.Left;
             RootList.Right = f2.RootList;
@@ -165,8 +147,7 @@ namespace CSharpLibraries.Algorithms.Structures
         }
 
 
-        public void DecreaseKey(TValue val, TKey newKey)
-        {
+        public void DecreaseKey(TValue val, TKey newKey){
             var x = _valueToNodeMap[val];
             newKey.RequireNotNullArg(nameof(newKey));
             if (_keyComparer(newKey, x.Key) > 0)
@@ -174,10 +155,8 @@ namespace CSharpLibraries.Algorithms.Structures
                     "New key should smaller than original key");
             x.Key = newKey;
             var y = x.Parent;
-            if (y != null)
-            {
-                if (_keyComparer(x.Key, y.Key) < 0)
-                {
+            if (y != null){
+                if (_keyComparer(x.Key, y.Key) < 0){
                     Cut(x, y);
                     CascadingCut(y);
                 }
@@ -186,17 +165,14 @@ namespace CSharpLibraries.Algorithms.Structures
             if (_keyComparer(x.Key, RootList!.Key) <= 0) RootList = x;
         }
 
-        internal void DecreaseKey(Node x, TKey newKey)
-        {
+        internal void DecreaseKey(Node x, TKey newKey){
             // move x to root list
             // set Parent mark true if Parent mark is false
             // else successively move true mark parents to root list
             x.Key = newKey;
             var y = x.Parent;
-            if (y != null)
-            {
-                if (_keyComparer(x.Key, y.Key) < 0)
-                {
+            if (y != null){
+                if (_keyComparer(x.Key, y.Key) < 0){
                     Cut(x, y);
                     CascadingCut(y);
                 }
@@ -205,22 +181,18 @@ namespace CSharpLibraries.Algorithms.Structures
             if (_keyComparer(x.Key, RootList!.Key) <= 0) RootList = x;
         }
 
-        private void Cut(Node a, Node b)
-        {
+        private void Cut(Node a, Node b){
             RemoveNodeFromList(a);
             b.Degree--;
             AddNodeToList(a, RootList!);
             a.Mark = false;
         }
 
-        private void CascadingCut(Node y)
-        {
+        private void CascadingCut(Node y){
             var z = y.Parent;
-            if (z != null)
-            {
+            if (z != null){
                 if (!y.Mark) y.Mark = true;
-                else
-                {
+                else{
                     Cut(y, z);
                     CascadingCut(z);
                 }
@@ -228,8 +200,7 @@ namespace CSharpLibraries.Algorithms.Structures
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Delete(Node x)
-        {
+        private void Delete(Node x){
             DecreaseKey(x, RootList!.Key);
             ExtractMin();
         }
@@ -237,8 +208,7 @@ namespace CSharpLibraries.Algorithms.Structures
         public bool Contains(TValue x) => _valueToNodeMap.ContainsKey(x);
 
 
-        private static void AddNodeToList(Node x, Node list)
-        {
+        private static void AddNodeToList(Node x, Node list){
             x.Parent = list.Parent;
             var listLeft = list.Left;
             list.Left = x;
@@ -247,21 +217,16 @@ namespace CSharpLibraries.Algorithms.Structures
             x.Left = listLeft;
         }
 
-        private static void RemoveNodeFromList(Node z)
-        {
+        private static void RemoveNodeFromList(Node z){
             var zRight = z.Right;
             var zLeft = z.Left;
-            if (z.Parent != null)
-            {
-                if (ReferenceEquals(z.Parent.ChildList, z))
-                {
-                    if (!ReferenceEquals(z.Right, z))
-                    {
+            if (z.Parent != null){
+                if (ReferenceEquals(z.Parent.ChildList, z)){
+                    if (!ReferenceEquals(z.Right, z)){
                         z.Parent.ChildList = z.Right;
                         z.Right.Parent = z.Parent;
                     }
-                    else
-                    {
+                    else{
                         z.Parent.ChildList = null;
                         z.Right = z;
                         z.Left = z;
@@ -279,13 +244,11 @@ namespace CSharpLibraries.Algorithms.Structures
             z.Parent = null;
         }
 
-        private static void LinkTo(Node l, Node m)
-        {
+        private static void LinkTo(Node l, Node m){
             // larger, minor
             RemoveNodeFromList(l);
             m.Degree++;
-            if (m.ChildList == null)
-            {
+            if (m.ChildList == null){
                 m.ChildList = l;
                 l.Parent = m;
             }

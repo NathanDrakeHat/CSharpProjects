@@ -1,9 +1,7 @@
-namespace CSharpLibraries.Algorithms.Structures
-{
-    public class IntervalSearchTree<TEle>
-    {
+namespace CSharpLibraries.Algorithms.Structures{
+    public class IntervalSearchTree<TEle>{
         // private readonly Func<TEle, TEle, int> _eleComparer;
-        
+
         // public IntervalSearchTree(Func<TEle, TEle, int> eleComparer) :
         //     base((tuple1, tuple2) => eleComparer(tuple1.Item1, tuple2.Item1))
         // {
@@ -34,7 +32,7 @@ namespace CSharpLibraries.Algorithms.Structures
         //     throw new ArgumentNullException();
         // return SearchLap(Root, range);
         // }
-        
+
         // private Tuple<TEle, TEle> SearchLap(Node n, Tuple<TEle, TEle> range)
         // {
         // if (n == Sentinel)

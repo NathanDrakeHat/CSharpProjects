@@ -9,13 +9,10 @@ using Range = System.Range;
 // ReSharper disable HeuristicUnreachableCode
 // ReSharper disable UnusedMember.Local
 
-namespace CSharpLibraries.Demos
-{
+namespace CSharpLibraries.Demos{
     // ReSharper disable once UnusedType.Global
-    public static class Demos
-    {
-        public static void StringFormatDemo()
-        {
+    public static class Demos{
+        public static void StringFormatDemo(){
             string applesText = "Apples";
             int applesCount = 1234;
             string bananasText = "Bananas";
@@ -37,13 +34,11 @@ namespace CSharpLibraries.Demos
             Console.WriteLine(formatted);
         }
 
-        public static void SwitchAssignmentDemo()
-        {
+        public static void SwitchAssignmentDemo(){
             string path = @"C:\Users\Nathan\HOME\projects\csharp";
             Stream fs = File.Open(Path.Combine(path, "temp_file.txt"), FileMode.CreateNew);
 
-            string message = fs switch
-            {
+            string message = fs switch{
                 FileStream _ when fs.CanWrite => "The stream is a file that I can write to.",
                 FileStream _ => "The stream is a read-only file.",
                 MemoryStream _ => "The stream is a memory address.",
@@ -53,11 +48,9 @@ namespace CSharpLibraries.Demos
             Console.WriteLine(message);
         }
 
-        public static void CheckedIntDemo()
-        {
+        public static void CheckedIntDemo(){
             int x = int.MaxValue - 1;
-            unchecked
-            {
+            unchecked{
                 Console.WriteLine($"Initial value: {x}");
                 x++;
                 Console.WriteLine($"After incrementing: {x}");
@@ -68,10 +61,8 @@ namespace CSharpLibraries.Demos
             }
 
             Console.WriteLine();
-            try
-            {
-                checked
-                {
+            try{
+                checked{
                     x = int.MaxValue - 1;
                     Console.WriteLine($"Initial value: {x}");
                     x++;
@@ -83,17 +74,15 @@ namespace CSharpLibraries.Demos
                     Console.WriteLine($"After incrementing: {x}");
                 }
             }
-            catch (OverflowException)
-            {
+            catch (OverflowException){
                 Console.WriteLine("The code overflowed but I caught the exception.");
             }
         }
 
-        public static void IndexRangeDemo()
-        {
+        public static void IndexRangeDemo(){
             Index a = ^5;
             Index b = ^2;
-            int[] array = {1, 2, 3, 4, 5, 6};
+            int[] array ={1, 2, 3, 4, 5, 6};
             Range r = new Range(a, b);
             int[] array1 = array[r];
             int[] array2 = array[a..];
@@ -102,24 +91,20 @@ namespace CSharpLibraries.Demos
             Console.WriteLine(string.Join(" ", array2));
         }
 
-        public static void MultiDimensionalArraySample()
-        {
+        public static void MultiDimensionalArraySample(){
             // ReSharper disable once UnusedVariable
-            int[,] matrix =
-            {
+            int[,] matrix ={
                 {1, 2, 3},
                 {4, 5, 6}
             };
             // ReSharper disable once UnusedVariable
-            int[][] jagged =
-            {
-                new[] {1, 2},
-                new[] {4, 5, 6}
+            int[][] jagged ={
+                new[]{1, 2},
+                new[]{4, 5, 6}
             };
         }
 
-        public static void ParameterModifierDemo()
-        {
+        public static void ParameterModifierDemo(){
             int x = 2;
             // ref: x is initialized
             Pow2(ref x);
@@ -148,82 +133,68 @@ namespace CSharpLibraries.Demos
             // named default parameters
             Console.WriteLine(ThreeDimensionPoint(z: 2));
 
-            static void Pow2(ref int x)
-            {
+            static void Pow2(ref int x){
                 x = x * x;
             }
 
-            static void GetPassWord(out string passWord)
-            {
+            static void GetPassWord(out string passWord){
                 passWord = "passwd";
             }
 
-            static void IncreaseData(MyData d)
-            {
+            static void IncreaseData(MyData d){
                 d.X++;
             }
 
-            static void IncreasePoint(MyPoint p)
-            {
+            static void IncreasePoint(MyPoint p){
                 p.X++;
                 p.Y++;
             }
 
-            static void PrintReadOnly(in MyData x, in MyPoint p)
-            {
+            static void PrintReadOnly(in MyData x, in MyPoint p){
                 x.X = 3;
                 Console.WriteLine($"class can be modified: {x.X}");
                 //p.X = 3; // compiler error
                 Console.WriteLine($"struct cannot be modified: {p.X}");
             }
 
-            static int Sum(params int[] a)
-            {
+            static int Sum(params int[] a){
                 int t = 0;
-                foreach (var i in a)
-                {
+                foreach (var i in a){
                     t += i;
                 }
 
                 return t;
             }
 
-            static string ThreeDimensionPoint(int x = 0, int y = 0, int z = 0)
-            {
+            static string ThreeDimensionPoint(int x = 0, int y = 0, int z = 0){
                 return $"x:{x},y:{y}, z:{z}";
             }
         }
 
-        private struct MyPoint
-        {
+        private struct MyPoint{
             public int X;
 
             // ReSharper disable once NotAccessedField.Local
             public int Y;
         }
 
-        private sealed class MyData
-        {
+        private sealed class MyData{
             public int X;
             public readonly double Y;
 
-            public MyData()
-            {
+            public MyData(){
             }
 
             public MyData(int x, int y) => (X, Y) = (x, y);
 
-            public void Deconstruct(out int x, out double y)
-            {
+            public void Deconstruct(out int x, out double y){
                 x = X;
                 y = Y;
             }
         }
 
-        public static void TypeMatchDemo(object o)
-        {
-            switch (o)
-            {
+        public static void TypeMatchDemo(object o){
+            switch (o){
                 case int _:
                     Console.WriteLine("is int");
                     break;
@@ -241,26 +212,22 @@ namespace CSharpLibraries.Demos
             throw new Exception();
         }
 
-        public static void DeconstructDemo()
-        {
+        public static void DeconstructDemo(){
             var d = new MyData(10, 11);
             var (x, y) = d;
             Console.WriteLine($"{x}, {y}");
         }
 
 
-        public static void EventDemo()
-        {
+        public static void EventDemo(){
             Group group = new Group(1);
             Person bob = new Person(1);
             Person alice = new Person(1);
-            group.OnMoneyChanged += (_, arg) =>
-            {
+            group.OnMoneyChanged += (_, arg) => {
                 bob.Salary = arg.NewSalary;
                 Console.WriteLine($"Bob new salary: {bob.Salary}");
             };
-            group.OnMoneyChanged += (_, arg) =>
-            {
+            group.OnMoneyChanged += (_, arg) => {
                 alice.Salary = arg.NewSalary;
                 Console.WriteLine($"Alice new salary: {alice.Salary}");
             };
@@ -268,43 +235,34 @@ namespace CSharpLibraries.Demos
             group.Salary = 31;
         }
 
-        private sealed class Person
-        {
+        private sealed class Person{
             public int Salary;
 
-            public Person(int initSalary)
-            {
+            public Person(int initSalary){
                 Salary = initSalary;
             }
         }
 
-        private sealed class MoneyChangedArg : EventArgs
-        {
+        private sealed class MoneyChangedArg : EventArgs{
             public readonly int NewSalary;
 
-            public MoneyChangedArg(int newSalary)
-            {
+            public MoneyChangedArg(int newSalary){
                 NewSalary = newSalary;
             }
         }
 
-        private sealed class Group
-        {
-            public event EventHandler<MoneyChangedArg> OnMoneyChanged
-            {
+        private sealed class Group{
+            public event EventHandler<MoneyChangedArg> OnMoneyChanged{
                 add => _onMoneyChanged = (EventHandler<MoneyChangedArg>) Delegate.Combine(value, _onMoneyChanged);
                 remove => _onMoneyChanged = (EventHandler<MoneyChangedArg>) Delegate.Remove(_onMoneyChanged, value);
             }
 
-            private EventHandler<MoneyChangedArg> _onMoneyChanged = delegate { };
+            private EventHandler<MoneyChangedArg> _onMoneyChanged = delegate{ };
 
-            public int Salary
-            {
+            public int Salary{
                 get => _salary;
-                set
-                {
-                    if (_salary != value)
-                    {
+                set{
+                    if (_salary != value){
                         _salary = value;
                         _onMoneyChanged?.Invoke(this, new MoneyChangedArg(value));
                     }
@@ -313,26 +271,21 @@ namespace CSharpLibraries.Demos
 
             private int _salary;
 
-            public Group(int initSalary)
-            {
+            public Group(int initSalary){
                 _salary = initSalary;
             }
         }
 
-        public static void AsyncDemo()
-        {
+        public static void AsyncDemo(){
             var task = PrintResultAsync();
             Console.WriteLine("This line should be printed first since it's not blocked.");
             task.Wait();
         }
 
-        private static async Task PrintResultAsync()
-        {
-            long res = await Task.Run(() =>
-            {
+        private static async Task PrintResultAsync(){
+            long res = await Task.Run(() => {
                 long r = 0;
-                for (int i = 0; i < 10000000; i++)
-                {
+                for (int i = 0; i < 10000000; i++){
                     r += i;
                 }
 

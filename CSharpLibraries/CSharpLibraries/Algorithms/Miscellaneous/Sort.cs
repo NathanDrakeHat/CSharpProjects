@@ -3,21 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpLibraries.Algorithms.Miscellaneous
-{
+namespace CSharpLibraries.Algorithms.Miscellaneous{
     /// <summary>
     /// In place sort
     /// </summary>
-    public static class Sort
-    {
-        public sealed class RawDate
-        {
+    public static class Sort{
+        public sealed class RawDate{
             public readonly int Year;
             public readonly int Month;
             public readonly int Day;
 
-            public RawDate(int y, int m, int d)
-            {
+            public RawDate(int y, int m, int d){
                 Year = y;
                 Month = m;
                 Day = d;
@@ -25,8 +21,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         }
 
         public static IList<T> IterativeMergeSort<T>(this IList<T> list)
-            where T : IComparable<T>, new()
-        {
+            where T : IComparable<T>, new(){
             if (list == null) throw new ArgumentNullException();
             if (list.Count <= 1) return list;
 
@@ -35,13 +30,11 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             int groupSize = 2;
             int lastRestLen = 0;
             bool notExpOf2 = (((int) Math.Pow(2, expTimes)) != list.Count);
-            if (notExpOf2)
-            {
+            if (notExpOf2){
                 lastRestLen = list.Count % 2 == 0 ? 2 : 1;
             }
 
-            for (int i = 0; i < expTimes; i++)
-            {
+            for (int i = 0; i < expTimes; i++){
                 int groupIterationTimes = list.Count / groupSize;
                 var cache1 = new T[groupSize / 2];
                 var cache2 = new T[groupSize / 2];
@@ -50,8 +43,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
 
 
                 int currentRestLen = list.Count - groupIterationTimes * groupSize;
-                if (currentRestLen > lastRestLen)
-                {
+                if (currentRestLen > lastRestLen){
                     var restCache1 = new T[currentRestLen - lastRestLen];
                     var restCache2 = new T[lastRestLen];
                     Merge(list, list.Count - currentRestLen, restCache1, restCache2);
@@ -61,8 +53,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 groupSize *= 2;
             }
 
-            if (notExpOf2)
-            {
+            if (notExpOf2){
                 var restCache1 = new T[groupSize / 2];
                 var restCache2 = new T[list.Count - groupSize / 2];
                 Merge(list, 0, restCache1, restCache2);
@@ -71,17 +62,14 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             return list;
         }
 
-        public static IList<T> RecursiveMergeSort<T>(this IList<T> list) where T : IComparable<T>, new()
-        {
+        public static IList<T> RecursiveMergeSort<T>(this IList<T> list) where T : IComparable<T>, new(){
             Sort(list, 0, list.Count);
             return list;
 
             #region InnerMethods
 
-            static void Sort(IList<T> array, int start, int end)
-            {
-                if ((end - start) > 1)
-                {
+            static void Sort(IList<T> array, int start, int end){
+                if ((end - start) > 1){
                     int middle = (start + end) / 2;
                     Sort(array, start, middle);
                     Sort(array, middle, end);
@@ -97,14 +85,12 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         }
 
         private static void ArrayCopy<T>(IList<T> src, int srcPos, IList<T> dest, int destPos, int length)
-            where T : IComparable<T>
-        {
+            where T : IComparable<T>{
             for (int i = srcPos; i < srcPos + length; i++)
                 dest[destPos++] = src[i];
         }
 
-        private static void Merge<T>(IList<T> array, int start, T[] cache1, T[] cache2) where T : IComparable<T>
-        {
+        private static void Merge<T>(IList<T> array, int start, T[] cache1, T[] cache2) where T : IComparable<T>{
             int rightIdx = 0;
             int leftIdx = 0;
             ArrayCopy(array, start, cache1, 0, cache1.Length);
@@ -112,8 +98,7 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             for (int i = start;
                 i < start + cache1.Length + cache2.Length && (rightIdx < cache2.Length) &&
                 (leftIdx < cache1.Length);
-                i++)
-            {
+                i++){
                 if (cache1[leftIdx].CompareTo(cache2[rightIdx]) <= 0) array[i] = cache1[leftIdx++];
                 else array[i] = cache2[rightIdx++];
             }
@@ -125,30 +110,25 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 ArrayCopy(cache2, rightIdx, array, start + leftIdx + rightIdx, cache2.Length - rightIdx);
         }
 
-        public static IList<T> QuickSort<T>(this IList<T> list) where T : IComparable<T>
-        {
+        public static IList<T> QuickSort<T>(this IList<T> list) where T : IComparable<T>{
             Sort(list, 0, list.Count);
             return list;
+
             #region InnerMethods
 
-            static void Sort(IList<T> list, int start, int end)
-            {
-                if ((end - start) > 1)
-                {
+            static void Sort(IList<T> list, int start, int end){
+                if ((end - start) > 1){
                     int middle = Partition(list, start, end);
                     Sort(list, start, middle);
                     Sort(list, middle, end);
                 }
             }
 
-            static int Partition(IList<T> list, int start, int end)
-            {
+            static int Partition(IList<T> list, int start, int end){
                 var pivot = list[end - 1];
                 int i = start - 1;
-                for (int j = start; j < end - 1; j++)
-                {
-                    if (list[j].CompareTo(pivot) <= 0)
-                    {
+                for (int j = start; j < end - 1; j++){
+                    if (list[j].CompareTo(pivot) <= 0){
                         var t = list[j];
                         list[j] = list[++i];
                         list[i] = t;
@@ -163,26 +143,24 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             #endregion
         }
 
-        public static IList<T> RandomQuickSort<T>(this IList<T> list) where T : IComparable<T>
-        {
+        public static IList<T> RandomQuickSort<T>(this IList<T> list) where T : IComparable<T>{
             Sort(list, 0, list.Count);
             return list;
+
             #region InnerMethods
 
-            static void Sort(IList<T> list, int start, int end)
-            {
-                if ((end - start) > 1)
-                {
+            static void Sort(IList<T> list, int start, int end){
+                if ((end - start) > 1){
                     int middle = RandomPartition(list, start, end);
                     Sort(list, start, middle);
                     Sort(list, middle, end);
                 }
             }
+
             #endregion
         }
-        
-        internal static int RandomPartition<T>(IList<T> a, int start, int end) where T : IComparable<T>
-        {
+
+        internal static int RandomPartition<T>(IList<T> a, int start, int end) where T : IComparable<T>{
             var rand = new Random();
             int pivotIdx = rand.Next(start, end);
             var pivot = a[pivotIdx];
@@ -192,10 +170,8 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             a[pivotIdx] = temp;
 
             int i = start - 1;
-            for (int j = start; j < end - 1; j++)
-            {
-                if (a[j].CompareTo(pivot) <= 0)
-                {
+            for (int j = start; j < end - 1; j++){
+                if (a[j].CompareTo(pivot) <= 0){
                     var t = a[j];
                     a[j] = a[++i];
                     a[i] = t;
@@ -207,12 +183,10 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             return i;
         }
 
-        public static IList<T> HeapSort<T>(this IList<T> list) where T : IComparable<T>
-        {
+        public static IList<T> HeapSort<T>(this IList<T> list) where T : IComparable<T>{
             BuildMaxHeap(list);
             int heapSize = list.Count;
-            for (int i = list.Count - 1; i >= 1; i--)
-            {
+            for (int i = list.Count - 1; i >= 1; i--){
                 var t = list[0];
                 list[0] = list[i];
                 list[i] = t;
@@ -220,29 +194,25 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
             }
 
             return list;
+
             #region InnerMethods
 
-            static void MaxHeapify(IList<T> arr, int idx, int heapSize)
-            {
-                while (true)
-                {
+            static void MaxHeapify(IList<T> arr, int idx, int heapSize){
+                while (true){
                     int l = 2 * (idx + 1);
                     int lIdx = l - 1;
                     int r = 2 * (idx + 1) + 1;
                     int rIdx = r - 1;
                     int maxIdx = idx;
-                    if (lIdx < heapSize && arr[lIdx].CompareTo(arr[maxIdx]) > 0)
-                    {
+                    if (lIdx < heapSize && arr[lIdx].CompareTo(arr[maxIdx]) > 0){
                         maxIdx = lIdx;
                     }
 
-                    if (rIdx < heapSize && arr[rIdx].CompareTo(arr[maxIdx]) > 0)
-                    {
+                    if (rIdx < heapSize && arr[rIdx].CompareTo(arr[maxIdx]) > 0){
                         maxIdx = rIdx;
                     }
 
-                    if (maxIdx != idx)
-                    {
+                    if (maxIdx != idx){
                         var t = arr[maxIdx];
                         arr[maxIdx] = arr[idx];
                         arr[idx] = t;
@@ -254,10 +224,8 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
                 }
             }
 
-            static void BuildMaxHeap(IList<T> arr)
-            {
-                for (int i = arr.Count / 2 - 1; i >= 0; i--)
-                {
+            static void BuildMaxHeap(IList<T> arr){
+                for (int i = arr.Count / 2 - 1; i >= 0; i--){
                     MaxHeapify(arr, i, arr.Count);
                 }
             }
@@ -269,37 +237,30 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         /// int mean distributed data only
         /// </summary>
         /// <param name="list"></param>
-        public static IList<int> CountingSort(this IList<int> list)
-        {
+        public static IList<int> CountingSort(this IList<int> list){
             var b = new int[list.Count];
             int min = list[0], max = list[0];
-            for (int i = 1; i < list.Count; i++)
-            {
-                if (list[i] > max)
-                {
+            for (int i = 1; i < list.Count; i++){
+                if (list[i] > max){
                     max = list[i];
                 }
 
-                if (list[i] < min)
-                {
+                if (list[i] < min){
                     min = list[i];
                 }
             }
 
             int range = max - min + 1;
             int[] c = new int[range];
-            foreach (int value in list)
-            {
+            foreach (int value in list){
                 c[(value - min)]++;
             }
 
-            for (int i = 1; i < range; i++)
-            {
+            for (int i = 1; i < range; i++){
                 c[i] = c[i] + c[i - 1];
             }
 
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
+            for (int i = list.Count - 1; i >= 0; i--){
                 b[c[(list[i] - min)] - 1] = list[i];
                 c[(list[i] - min)]--;
             }
@@ -312,87 +273,75 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         /// mean distribution, input[0,1)
         /// </summary>
         /// <param name="list"></param>
-        public static IList<double> BucketSort(this IList<double> list)
-        {
+        public static IList<double> BucketSort(this IList<double> list){
             var b = new List<List<double>>();
             int n = list.Count;
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 b.Add(new List<double>());
             }
 
-            foreach (var ai in list)
-            {
+            foreach (var ai in list){
                 b[(int) Math.Floor(n * ai)].Add(ai);
             }
 
             var resList = new List<double>();
-            foreach (var l in b)
-            {
+            foreach (var l in b){
                 l.Sort();
                 resList.AddRange(l);
             }
 
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 list[i] = resList[i];
             }
+
             return list;
         }
 
-        public static IList<float> BucketSort(this IList<float> list)
-        {
+        public static IList<float> BucketSort(this IList<float> list){
             var b = new List<List<float>>();
             int n = list.Count;
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 b.Add(new List<float>());
             }
 
-            foreach (var ai in list)
-            {
+            foreach (var ai in list){
                 b[(int) Math.Floor(n * ai)].Add(ai);
             }
 
             var resList = new List<float>();
-            foreach (var l in b)
-            {
+            foreach (var l in b){
                 l.Sort();
                 resList.AddRange(l);
             }
 
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 list[i] = resList[i];
             }
+
             return list;
         }
 
-        public static IList<decimal> BucketSort(this IList<decimal> list)
-        {
+        public static IList<decimal> BucketSort(this IList<decimal> list){
             var b = new List<List<decimal>>();
             int n = list.Count;
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 b.Add(new List<decimal>());
             }
 
-            foreach (var ai in list)
-            {
+            foreach (var ai in list){
                 b[(int) Math.Floor(n * ai)].Add(ai);
             }
 
             var resList = new List<decimal>();
-            foreach (var l in b)
-            {
+            foreach (var l in b){
                 l.Sort();
                 resList.AddRange(l);
             }
 
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 list[i] = resList[i];
             }
+
             return list;
         }
 
@@ -400,14 +349,10 @@ namespace CSharpLibraries.Algorithms.Miscellaneous
         /// sort properties from smaller to bigger
         /// </summary>
         /// <param name="list"></param>
-        public static IList<RawDate> RadixSort(this IList<RawDate> list)
-        {
-            var t = list.OrderBy(d=>d.Day).ToList().
-                OrderBy(d=>d.Month).ToList().
-                OrderBy(d=>d.Year).ToList();
+        public static IList<RawDate> RadixSort(this IList<RawDate> list){
+            var t = list.OrderBy(d => d.Day).ToList().OrderBy(d => d.Month).ToList().OrderBy(d => d.Year).ToList();
             int i = 0;
-            foreach (var date in t)
-            {
+            foreach (var date in t){
                 list[i] = date;
                 i++;
             }

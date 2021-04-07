@@ -2,62 +2,40 @@
 using System;
 using System.Collections.Generic;
 using static CSharpLibraries.Interpreters.InterpretersExceptions;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using Lambda = System.Func<System.Collections.Generic.List<object>, object>;
 using static CSharpLibraries.Interpreters.Environment;
+using static CSharpLibraries.Interpreters.Symbol;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
-namespace CSharpLibraries.Interpreters
-{
-    public sealed class LispInterpreter
-    {
+namespace CSharpLibraries.Interpreters{
+    public sealed class LispInterpreter{
         internal static readonly IList<object> Nil = new List<object>(0);
 
-        private readonly Environment _globalEnv = StandardEnv();
+        private readonly Environment _globalEnv = NewStandardEnv();
 
-        public object RunScheme(string program) => Eval(Parse(program));
+        public object RunScheme(string program) => Eval(Parse(program), _globalEnv);
 
-        public void Repl(string prompt = "NScheme>")
-        {
-#if DEBUG
-            var w = new Stopwatch();
-#endif
-
-            while (true)
-            {
+        public void Repl(string prompt = "NScheme>"){
+            while (true){
                 var s = ReadLine(prompt);
-                if (s.Equals(""))
-                {
+                if (s.Equals("")){
                     continue;
                 }
 
                 object val = null;
-                try
-                {
-#if DEBUG
-                    w.Restart();
-#endif
-                    val = Eval(Parse(s));
-#if DEBUG
-                    Console.WriteLine($"time:{w.ElapsedMilliseconds}ms");
-#endif
+                try{
+                    val = Eval(Parse(s), _globalEnv);
                 }
-                catch (Exception e)
-                {
+                catch (Exception e){
                     Console.WriteLine($"{e.GetType().Name}: {e.Message}\n");
-#if DEBUG
-                    Console.WriteLine(e.StackTrace);
-#endif
                 }
 
-                if (val != null)
-                {
+                if (val != null){
                     Console.WriteLine(val);
                 }
             }
@@ -67,50 +45,57 @@ namespace CSharpLibraries.Interpreters
 
         public object Parse(string program) => ParseTokens(Tokenize(program));
 
-        private object Eval(object x) => Eval(x, _globalEnv);
 
-        private static object Eval(object x, Environment currentEnv)
-        {
-            if (x is string)
-            {
-                return currentEnv.Find(x)[x];
-            }
-            else if (!(x is List<object>))
-            {
-                return x;
-            }
-
-            List<object> list = (List<object>) x;
-            var op = list[0];
-            var args = list.GetRange(1, list.Count - 1);
-
-            switch (op)
-            {
-                case "if":
-                    object test = args[0];
-                    object conSeq = args[1];
-                    object alt = args[2];
-                    object exp = (bool) Eval(test, currentEnv) ? conSeq : alt;
-                    return Eval(exp, currentEnv);
-                case "define":
-                    object symbol = args[0];
-                    object expression = args[1];
-                    currentEnv[symbol] = Eval(expression, currentEnv);
+        internal static object Eval(object x, Environment currentEnv){
+            while (true){
+                if (x is Symbol) { return currentEnv.Find(x)[x]; }
+                else if (!(x is IList<object>)) { return x; }
+                IList<object> l = (IList<object>) x;
+                var op = l[0];
+                if (op.Equals(SymQuote)) { return l[1]; }
+                else if (op.Equals(SymIf)) {
+                    var test = l[1];
+                    var conseq = l[2];
+                    var alt = l[3];
+                    bool testBool = ObjectIsTrue(Eval(test, currentEnv));
+                    x = testBool ? conseq : alt;
+                }
+                else if (op.Equals(SymSet)) {
+                    var v = l[1];
+                    var exp = l[2];
+                    currentEnv.Find(v)[v] = Eval(exp, currentEnv);
                     return null;
-                case "lambda":
-                    IEnumerable<object> parameters = (IEnumerable<object>) args[0];
-                    object body = args[1];
-                    return new Lambda(arguments => Eval(body, new Environment(parameters, arguments, currentEnv)));
-                default:
-                    Lambda proc = (Lambda) Eval(op, currentEnv);
-                    List<object> vals = args.Select(arg => Eval(arg, currentEnv)).ToList();
-
-                    return proc(vals);
+                }
+                else if (op.Equals(SymDefine)) {
+                    var v = l[1];
+                    var exp = l[2];
+                    currentEnv[v] =  Eval(exp, currentEnv);
+                    return null;
+                }
+                else if (op.Equals(SymLambda)) {
+                    var vars = l[1];
+                    var exp = l[2];
+                    return new Procedure(vars, exp, currentEnv);
+                }
+                else if (op.Equals(SymBegin)) {
+                    foreach (var exp in l.Take(1).ToList()) Eval(exp, currentEnv);
+                    x = l[^1];
+                }
+                else {
+                    Environment finalEnv = currentEnv;
+                    IList<object> expression = l.Select(exp => Eval(exp, finalEnv)).ToList();
+                    var proc = expression[0];
+                    expression = expression.Take(1).ToList();
+                    if (proc is Procedure p) {
+                        x = p.Expression;
+                        currentEnv = new Environment(p.Parameters, expression, p.Environment);
+                    }
+                    else { return ((Lambda) proc).Apply(expression); }
+                }
             }
         }
 
-        private static string ReadLine(string prompt)
-        {
+        private static string ReadLine(string prompt){
             Console.Write(prompt);
             return Console.ReadLine();
         }
@@ -121,17 +106,13 @@ namespace CSharpLibraries.Interpreters
         /// <param name="tokens">list of tokens</param>
         /// <returns></returns>
         /// <exception cref="SyntaxException"></exception>
-        private object ParseTokens(Queue<string> tokens)
-        {
+        private object ParseTokens(Queue<string> tokens){
             if (tokens.Count == 0) throw new SyntaxException("unexpected EOF");
             var token = tokens.Dequeue();
-            switch (token)
-            {
-                case "(":
-                {
+            switch (token){
+                case "(":{
                     var l = new List<object>();
-                    while (!tokens.Peek().Equals(")"))
-                    {
+                    while (!tokens.Peek().Equals(")")){
                         l.Add(ParseTokens(tokens));
                     }
 
@@ -150,101 +131,82 @@ namespace CSharpLibraries.Interpreters
         /// </summary>
         /// <param name="program">string</param>
         /// <returns>tokens list</returns>
-        private Queue<string> Tokenize(string program)
-        {
+        private Queue<string> Tokenize(string program){
             var t = program.Replace("(", " ( ").Replace(")", " ) ").Split().ToList();
             t.RemoveAll(s => s.Equals(""));
             Queue<string> res = new Queue<string>();
-            foreach (var i in t)
-            {
+            foreach (var i in t){
                 res.Enqueue(i);
             }
 
             return res;
         }
 
-        private object ToAtom(string x)
-        {
+        private object ToAtom(string x){
             bool succ = int.TryParse(x, out int t);
-            if (!succ)
-            {
+            if (!succ){
                 bool succ1 = double.TryParse(x, out double t1);
-                if (!succ1)
-                {
+                if (!succ1){
                     return x;
                 }
-                else
-                {
+                else{
                     return t1;
                 }
             }
-            else
-            {
+            else{
                 return t;
             }
         }
 
-        internal static string EvalToString(object x)
-        {
-            if (x == null)
-            {
+        internal static string EvalToString(object x){
+            if (x == null){
                 return null;
             }
-            else if (x.Equals(true))
-            {
+            else if (x.Equals(true)){
                 return "#t";
             }
-            else if (x.Equals(false))
-            {
+            else if (x.Equals(false)){
                 return "#f";
             }
-            else switch (x)
-            {
-                case Symbol symX:
-                    return symX.ToString();
-                case String strX:
-                    return Regex.Unescape(strX);
-                case List<object> lx:
-                {
-                    var s = new StringBuilder("(");
-                    foreach (var i in lx)
-                    {
-                        s.Append(EvalToString(i));
-                        s.Append(' ');
-                    }
+            else
+                switch (x){
+                    case Symbol symX:
+                        return symX.ToString();
+                    case String strX:
+                        return Regex.Unescape(strX);
+                    case List<object> lx:{
+                        var s = new StringBuilder("(");
+                        foreach (var i in lx){
+                            s.Append(EvalToString(i));
+                            s.Append(' ');
+                        }
 
-                    if (lx.Count >= 1)
-                    {
-                        s.Remove(s.Length - 1, 1);
-                    }
+                        if (lx.Count >= 1){
+                            s.Remove(s.Length - 1, 1);
+                        }
 
-                    s.Append(')');
-                    return s.ToString();
+                        s.Append(')');
+                        return s.ToString();
+                    }
+                    case Complex comX:
+                        // TODO formatter
+                        return comX.ToString();
+                    default:
+                        return x.ToString();
                 }
-                case Complex comX:
-                    // TODO formatter
-                    return comX.ToString();
-                default:
-                    return x.ToString();
-            }
         }
 
-        internal static bool ObjectIsNil(object o)
-        {
-            if (o is List<object> l)
-            {
+        internal static bool ObjectIsNil(object o){
+            if (o is List<object> l){
                 return l.Count == 0;
             }
-            else
-            {
+            else{
                 return false;
             }
         }
 
-        static bool ObjectIsTrue(object o)
-        {
-            switch (o)
-            {
+        static bool ObjectIsTrue(object o){
+            switch (o){
                 case bool b:
                     return b;
                 case null:

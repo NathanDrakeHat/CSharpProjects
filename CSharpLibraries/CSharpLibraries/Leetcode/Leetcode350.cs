@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpLibraries.Leetcode
-{
-    public static class Leetcode350
-    {
+namespace CSharpLibraries.Leetcode{
+    public static class Leetcode350{
         /// <summary>
         /// #328
         /// <br/>奇偶链表
@@ -19,40 +17,34 @@ namespace CSharpLibraries.Leetcode
         /// </summary>
         /// <param name="head"></param>
         /// <returns></returns>
-        public static ListNode OddEvenList(ListNode head)
-        {
-            if (head == null)
-            {
+        public static ListNode OddEvenList(ListNode head){
+            if (head == null){
                 return null;
             }
+
             ListNode oddTailPtr = head, evenTailPtr = head.next;
 
-            if (evenTailPtr.next == null)
-            {
+            if (evenTailPtr.next == null){
                 return head;
             }
 
-            while (evenTailPtr?.next != null)
-            {
+            while (evenTailPtr?.next != null){
                 var t = ExtractAndJumpToEvenTail(ref evenTailPtr);
-                if (t != null)
-                {
+                if (t != null){
                     InsertAndJumpToOddTail(ref oddTailPtr, t);
                 }
             }
-            
+
             return head;
 
             //
-            static void InsertAndJumpToOddTail(ref ListNode list, ListNode n)
-            {
+            static void InsertAndJumpToOddTail(ref ListNode list, ListNode n){
                 n.next = list.next;
                 list.next = n;
                 list = n;
             }
 
-            static ListNode ExtractAndJumpToEvenTail(ref ListNode n)
-            {
+            static ListNode ExtractAndJumpToEvenTail(ref ListNode n){
                 var target = n.next;
                 var origin = n;
                 n = n?.next?.next;
@@ -60,7 +52,7 @@ namespace CSharpLibraries.Leetcode
                 return target;
             }
         }
-        
+
         /// <summary>
         /// #349
         /// <br/>
@@ -69,15 +61,12 @@ namespace CSharpLibraries.Leetcode
         /// <param name="nums1"></param>
         /// <param name="nums2"></param>
         /// <returns></returns>
-        public static int[] Intersection(int[] nums1, int[] nums2)
-        {
+        public static int[] Intersection(int[] nums1, int[] nums2){
             // TODO better solution
             var set = new HashSet<int>(nums1);
             var res = new HashSet<int>();
-            foreach (int i in nums2)
-            {
-                if (set.Contains(i))
-                {
+            foreach (int i in nums2){
+                if (set.Contains(i)){
                     res.Add(i);
                 }
             }

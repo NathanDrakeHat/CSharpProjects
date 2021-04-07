@@ -2,20 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpLibraries.Algorithms.Graph
-{
+namespace CSharpLibraries.Algorithms.Graph{
     /// <summary>
     /// all pair shortest path
     /// </summary>
-    public static class ApShortestPath
-    {
+    public static class ApShortestPath{
         // O(V^4)
-        public static double[][] SlowAllPairsShortestPaths(double[][] weight)
-        {
+        public static double[][] SlowAllPairsShortestPaths(double[][] weight){
             var n = weight.Length;
             var l = weight;
-            for (int m = 2; m <= n - 1; m++)
-            {
+            for (int m = 2; m <= n - 1; m++){
                 l = ExtendedShortestPath(l, weight);
             }
 
@@ -23,22 +19,17 @@ namespace CSharpLibraries.Algorithms.Graph
             return l;
         }
 
-        private static double[][] ExtendedShortestPath(double[][] lOrigin, double[][] weight)
-        {
+        private static double[][] ExtendedShortestPath(double[][] lOrigin, double[][] weight){
             var n = weight.Length;
             var lNext = new double[n][];
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++){
                 lNext[i] = new double[n];
             }
 
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
+            for (int i = 0; i < n; i++){
+                for (int j = 0; j < n; j++){
                     lNext[i][j] = double.PositiveInfinity;
-                    for (int k = 0; k < n; k++)
-                    {
+                    for (int k = 0; k < n; k++){
                         lNext[i][j] = Math.Min(lNext[i][j], lOrigin[i][k] + weight[k][j]);
                     }
                 }
@@ -48,13 +39,11 @@ namespace CSharpLibraries.Algorithms.Graph
         }
 
         // O(V^3*lgV)
-        public static double[][] FasterAllPairsShortestPaths(double[][] weight)
-        {
+        public static double[][] FasterAllPairsShortestPaths(double[][] weight){
             var n = weight.Length;
             var l = weight;
             int m = 1;
-            for (; m < n - 1; m *= 2)
-            {
+            for (; m < n - 1; m *= 2){
                 l = ExtendedShortestPath(l, l);
             }
 
@@ -62,22 +51,17 @@ namespace CSharpLibraries.Algorithms.Graph
         }
 
         // no negative-Weight cycles
-        public static double[][] FloydWarshall(double[][] weight)
-        {
+        public static double[][] FloydWarshall(double[][] weight){
             var n = weight.Length;
             var dOrigin = weight;
-            for (int k = 0; k < n; k++)
-            {
+            for (int k = 0; k < n; k++){
                 var dCurrent = new double[n][];
-                for (int i = 0; i < n; i++)
-                {
+                for (int i = 0; i < n; i++){
                     dCurrent[i] = new double[n];
                 }
 
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
+                for (int i = 0; i < n; i++){
+                    for (int j = 0; j < n; j++){
                         dCurrent[i][j] = Math.Min(dOrigin[i][j], dOrigin[i][k] + dOrigin[k][j]);
                     }
                 }
@@ -89,25 +73,19 @@ namespace CSharpLibraries.Algorithms.Graph
         }
 
 
-        public static bool[,] TransitiveClosure(double[][] weight)
-        {
+        public static bool[,] TransitiveClosure(double[][] weight){
             var n = weight.Length;
             var t = new bool[n, n];
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
+            for (int i = 0; i < n; i++){
+                for (int j = 0; j < n; j++){
                     t[i, j] = (i == j) || !weight[i][j].Equals(double.PositiveInfinity);
                 }
             }
 
-            for (int k = 0; k < n; k++)
-            {
+            for (int k = 0; k < n; k++){
                 var tK = new bool[n, n];
-                for (int i = 0; i < n; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
+                for (int i = 0; i < n; i++){
+                    for (int j = 0; j < n; j++){
                         tK[i, j] = t[i, j] || (t[i, k] && t[k, j]);
                     }
                 }
@@ -129,41 +107,34 @@ namespace CSharpLibraries.Algorithms.Graph
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static double[,] Johnson<T>(LinkedGraph<Bfs.BfsVertex<T>> graph, Action<LinkedGraph<Bfs.BfsVertex<T>>, Bfs.BfsVertex<T>> dijkstra)
-        {
+        public static double[,] Johnson<T>(LinkedGraph<Bfs.BfsVertex<T>> graph,
+            Action<LinkedGraph<Bfs.BfsVertex<T>>, Bfs.BfsVertex<T>> dijkstra){
             var h = new Dictionary<Bfs.BfsVertex<T>, double>();
             var n = graph.Size;
             var verticesNew = graph.AllVertices();
             var s = new Bfs.BfsVertex<T>();
             verticesNew.Add(s);
             var newGraph = BuildGraph(graph, verticesNew, s);
-            if (!SsShortestPath.BellmanFord(newGraph, s))
-            {
+            if (!SsShortestPath.BellmanFord(newGraph, s)){
                 throw new InvalidOperationException();
             }
-            else
-            {
+            else{
                 var edgesNew = newGraph.AllEdges();
-                foreach (var vertex in verticesNew)
-                {
+                foreach (var vertex in verticesNew){
                     h[vertex] = vertex.Distance;
                 }
 
-                foreach (var edge in edgesNew)
-                {
+                foreach (var edge in edgesNew){
                     edge.Weight = edge.Weight + edge.FormerVertex.Distance - edge.LaterVertex.Distance;
                 }
 
                 var d = new double[n, n];
                 int idxU = 0;
-                foreach (var u in verticesNew)
-                {
-                    if (u != s)
-                    {
+                foreach (var u in verticesNew){
+                    if (u != s){
                         int idxV = 0;
                         dijkstra(graph, u);
-                        foreach (var v in verticesNew.Where(v => v != s))
-                        {
+                        foreach (var v in verticesNew.Where(v => v != s)){
                             d[idxU, idxV] = v.Distance + h[v] - h[u];
                             idxV++;
                         }
@@ -177,14 +148,11 @@ namespace CSharpLibraries.Algorithms.Graph
         }
 
         private static LinkedGraph<Bfs.BfsVertex<T>> BuildGraph<T>(LinkedGraph<Bfs.BfsVertex<T>> graph,
-            IEnumerable<Bfs.BfsVertex<T>> vertices, Bfs.BfsVertex<T> s)
-        {
+            IEnumerable<Bfs.BfsVertex<T>> vertices, Bfs.BfsVertex<T> s){
             var newGraph = new LinkedGraph<Bfs.BfsVertex<T>>(graph);
             newGraph.AddVertex(s);
-            foreach (var vertex in vertices)
-            {
-                if (vertex != s)
-                {
+            foreach (var vertex in vertices){
+                if (vertex != s){
                     newGraph.SetNeighbor(s, vertex);
                 }
             }

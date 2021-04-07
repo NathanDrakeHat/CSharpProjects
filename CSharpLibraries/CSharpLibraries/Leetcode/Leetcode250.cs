@@ -1,26 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CSharpLibraries.Leetcode
-{
-    public static class Leetcode250
-    {
+namespace CSharpLibraries.Leetcode{
+    public static class Leetcode250{
         /// <summary>
         /// #217
         /// </summary>
         /// <param name="nums"></param>
         /// <returns></returns>
-        public static bool ContainsDuplicate(int[] nums)
-        {
+        public static bool ContainsDuplicate(int[] nums){
             HashSet<int> t = new HashSet<int>();
-            foreach (int num in nums)
-            {
-                if (t.Contains(num))
-                {
+            foreach (int num in nums){
+                if (t.Contains(num)){
                     return true;
                 }
-                else
-                {
+                else{
                     t.Add(num);
                 }
             }
@@ -37,17 +31,14 @@ namespace CSharpLibraries.Leetcode
         /// <param name="s"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static bool IsAnagram(string s, string t)
-        {
+        public static bool IsAnagram(string s, string t){
             char[] s1 = new char[26];
             char[] s2 = new char[26];
-            foreach (char c in s)
-            {
+            foreach (char c in s){
                 s1[c - 'a']++;
             }
 
-            foreach (char c in t)
-            {
+            foreach (char c in t){
                 s2[c - 'a']++;
             }
 

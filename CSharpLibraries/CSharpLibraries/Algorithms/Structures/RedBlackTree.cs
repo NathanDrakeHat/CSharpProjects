@@ -7,17 +7,14 @@ using static CSharpLibraries.Utils.Extension;
 
 [assembly: InternalsVisibleTo("CSharpLibrariesTest")]
 
-namespace CSharpLibraries.Algorithms.Structures
-{
-    public sealed class RedBlackTree<TKey, TValue> : IEnumerable<Tuple<TKey, TValue>>
-    {
+namespace CSharpLibraries.Algorithms.Structures{
+    public sealed class RedBlackTree<TKey, TValue> : IEnumerable<Tuple<TKey, TValue>>{
         #region InnerClass
 
         private const bool Red = false;
         private const bool Black = true;
 
-        internal sealed class Node
-        {
+        internal sealed class Node{
             // ReSharper disable once FieldCanBeMadeReadOnly.Global
             internal TKey Key;
             internal TValue Value;
@@ -28,8 +25,7 @@ namespace CSharpLibraries.Algorithms.Structures
 
             internal Node(bool color) => Color = color;
 
-            internal Node(TKey key, TValue val)
-            {
+            internal Node(TKey key, TValue val){
                 Color = Red;
                 Key = key;
                 Value = val;
@@ -39,7 +35,7 @@ namespace CSharpLibraries.Algorithms.Structures
         #endregion
 
 
-        public int Count { get; private set; }
+        public int Count{ get; private set; }
         internal Node Root;
         private readonly Func<TKey, TKey, int> _kComparator;
         private readonly Node _sentinel = new Node(Black); // sentinel: denote leaf and parent of root
@@ -50,8 +46,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="kComparator"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RedBlackTree(Func<TKey, TKey, int> kComparator)
-        {
+        public RedBlackTree(Func<TKey, TKey, int> kComparator){
             _kComparator = kComparator ?? throw new ArgumentNullException(nameof(kComparator));
             Root = _sentinel;
         }
@@ -62,8 +57,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="low">include</param>
         /// <param name="high">include</param>
         /// <returns></returns>
-        public List<TKey> KeyRangeSearch(TKey low, TKey high)
-        {
+        public List<TKey> KeyRangeSearch(TKey low, TKey high){
             low.RequireNotNullArg(nameof(low));
             var res = new List<TKey>();
             if (!NotNullTree()) return res;
@@ -76,8 +70,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <returns>Minimum key</returns>
         /// <exception cref="InvalidOperationException">Null tree</exception>
-        public TKey MinKey()
-        {
+        public TKey MinKey(){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             return GetMinimum(Root).Key;
         }
@@ -87,8 +80,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public TValue ValueOfMinKey()
-        {
+        public TValue ValueOfMinKey(){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             return GetMinimum(Root).Value;
         }
@@ -98,8 +90,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public TKey MaxKey()
-        {
+        public TKey MaxKey(){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             return GetMaximum(Root).Key;
         }
@@ -109,8 +100,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public TValue ValueOfMaxKey()
-        {
+        public TValue ValueOfMaxKey(){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             return GetMaximum(Root).Value;
         }
@@ -120,41 +110,32 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public int GetHeight()
-        {
+        public int GetHeight(){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             return GetHeight(Root, 0) - 1;
         }
 
-        public IEnumerator<Tuple<TKey, TValue>> GetEnumerator()
-        {
+        public IEnumerator<Tuple<TKey, TValue>> GetEnumerator(){
             var n = Root;
-            if (n == null || n == _sentinel)
-            {
+            if (n == null || n == _sentinel){
                 yield break;
             }
 
             var stack = new Stack<Node>();
             bool poppedBefore = false;
-            while (n != null)
-            {
-                if (n.Left != _sentinel && !poppedBefore)
-                {
+            while (n != null){
+                if (n.Left != _sentinel && !poppedBefore){
                     stack.Push(n);
                     n = n.Left;
                 }
-                else
-                {
+                else{
                     var t = n;
-                    if (n.Right != _sentinel)
-                    {
+                    if (n.Right != _sentinel){
                         n = n.Right;
                         poppedBefore = false;
                     }
-                    else
-                    {
-                        if (stack.Count != 0)
-                        {
+                    else{
+                        if (stack.Count != 0){
                             n = stack.Pop();
                             poppedBefore = true;
                         }
@@ -166,35 +147,27 @@ namespace CSharpLibraries.Algorithms.Structures
             }
         }
 
-        public IEnumerable<Tuple<TKey, TValue>> GetReverseEnumerator()
-        {
+        public IEnumerable<Tuple<TKey, TValue>> GetReverseEnumerator(){
             var n = Root;
-            if (n == null || n == _sentinel)
-            {
+            if (n == null || n == _sentinel){
                 yield break;
             }
 
             var stack = new Stack<Node>();
             bool popped = false;
-            while (n != null)
-            {
-                if (n.Right != _sentinel && !popped)
-                {
+            while (n != null){
+                if (n.Right != _sentinel && !popped){
                     stack.Push(n);
                     n = n.Right;
                 }
-                else
-                {
+                else{
                     var t = n;
-                    if (n.Left != _sentinel)
-                    {
+                    if (n.Left != _sentinel){
                         n = n.Left;
                         popped = false;
                     }
-                    else
-                    {
-                        if (stack.Count != 0)
-                        {
+                    else{
+                        if (stack.Count != 0){
                             n = stack.Pop();
                             popped = true;
                         }
@@ -211,16 +184,13 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="key"></param>
         /// <param name="val"></param>
-        public void Insert(TKey key, TValue val)
-        {
+        public void Insert(TKey key, TValue val){
             key.RequireNotNullArg(nameof(key));
             var n = Search(Root, key);
-            if (n != null)
-            {
+            if (n != null){
                 n.Value = val;
             }
-            else
-            {
+            else{
                 Insert(new Node(key, val));
             }
 
@@ -233,8 +203,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="key"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public TValue Search(TKey key)
-        {
+        public TValue Search(TKey key){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             key.RequireNotNullArg(nameof(key));
             var res = Search(Root, key);
@@ -250,8 +219,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// <param name="key"></param>
         /// <param name="newValue"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void Set(TKey key, TValue newValue)
-        {
+        public void Set(TKey key, TValue newValue){
             key.RequireNotNullArg(nameof(key));
             var node = Search(Root, key);
             if (node == null) throw new InvalidOperationException("No such key.");
@@ -263,8 +231,7 @@ namespace CSharpLibraries.Algorithms.Structures
         /// </summary>
         /// <param name="key"></param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void Delete(TKey key)
-        {
+        public void Delete(TKey key){
             if (!NotNullTree()) throw new InvalidOperationException("Null tree.");
             key.RequireNotNullArg(nameof(key));
             var node = Search(Root, key);
@@ -273,21 +240,17 @@ namespace CSharpLibraries.Algorithms.Structures
             Count--;
         }
 
-        private void KeyRangeSearch(Node n, TKey low, TKey high, List<TKey> l)
-        {
+        private void KeyRangeSearch(Node n, TKey low, TKey high, List<TKey> l){
             if (n == _sentinel) return;
-            if (_kComparator(n.Key, low) >= 0 && _kComparator(n.Key, high) <= 0)
-            {
+            if (_kComparator(n.Key, low) >= 0 && _kComparator(n.Key, high) <= 0){
                 l.Add(n.Key);
             }
 
-            if (_kComparator(n.Key, low) > 0)
-            {
+            if (_kComparator(n.Key, low) > 0){
                 KeyRangeSearch(n.Left, low, high, l);
             }
 
-            if (_kComparator(n.Key, high) < 0)
-            {
+            if (_kComparator(n.Key, high) < 0){
                 KeyRangeSearch(n.Right, low, high, l);
             }
         }
@@ -295,18 +258,15 @@ namespace CSharpLibraries.Algorithms.Structures
         private bool NotNullTree() => Root != _sentinel;
 
 
-        private void ResetRoot(Node r)
-        {
+        private void ResetRoot(Node r){
             Root = r;
             Root.Parent = _sentinel;
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private int GetHeight(Node n, int height)
-        {
-            if (n != _sentinel)
-            {
+        private int GetHeight(Node n, int height){
+            if (n != _sentinel){
                 int leftMax = GetHeight(n.Left, height + 1);
                 int rightMax = GetHeight(n.Right, height + 1);
                 return Math.Max(leftMax, rightMax);
@@ -315,20 +275,16 @@ namespace CSharpLibraries.Algorithms.Structures
             return height;
         }
 
-        private void Insert(Node n)
-        {
-            if (!NotNullTree())
-            {
+        private void Insert(Node n){
+            if (!NotNullTree()){
                 ResetRoot(n);
                 Root.Right = _sentinel;
                 Root.Left = _sentinel;
             }
-            else
-            {
+            else{
                 var store = _sentinel;
                 var ptr = Root;
-                while (ptr != _sentinel)
-                {
+                while (ptr != _sentinel){
                     store = ptr;
                     ptr = _kComparator(n.Key, ptr.Key) < 0 ? ptr.Left : ptr.Right;
                 }
@@ -343,15 +299,11 @@ namespace CSharpLibraries.Algorithms.Structures
             InsertFixUp(n);
         }
 
-        private void InsertFixUp(Node ptr)
-        {
-            while (ptr.Parent!.Color == Red)
-            {
-                if (ptr.Parent == ptr.Parent.Parent.Left)
-                {
+        private void InsertFixUp(Node ptr){
+            while (ptr.Parent!.Color == Red){
+                if (ptr.Parent == ptr.Parent.Parent.Left){
                     var right = ptr.Parent.Parent.Right;
-                    if (right.Color == Red)
-                    {
+                    if (right.Color == Red){
                         // case1: sibling is red
                         ptr.Parent.Color = Black;
                         right.Color = Black;
@@ -359,8 +311,7 @@ namespace CSharpLibraries.Algorithms.Structures
                         ptr = ptr.Parent.Parent;
                         continue;
                     }
-                    else if (ptr == ptr.Parent.Right)
-                    {
+                    else if (ptr == ptr.Parent.Right){
                         //case 2 convert to case 3
                         ptr = ptr.Parent;
                         LeftRotate(ptr);
@@ -371,19 +322,16 @@ namespace CSharpLibraries.Algorithms.Structures
                     RightRotate(ptr.Parent.Parent); // ptr.getParent will be black and then break
                     ptr = ptr.Parent;
                 }
-                else
-                {
+                else{
                     var left = ptr.Parent.Parent.Left;
-                    if (left.Color == Red)
-                    {
+                    if (left.Color == Red){
                         ptr.Parent.Color = Black;
                         left.Color = Black;
                         ptr.Parent.Parent.Color = Red;
                         ptr = ptr.Parent.Parent;
                         continue;
                     }
-                    else if (ptr == ptr.Parent.Left)
-                    {
+                    else if (ptr == ptr.Parent.Left){
                         ptr = ptr.Parent;
                         RightRotate(ptr);
                     }
@@ -398,30 +346,25 @@ namespace CSharpLibraries.Algorithms.Structures
             Root.Color = Black;
         }
 
-        private void Delete(Node target)
-        {
+        private void Delete(Node target){
             var ptr = target;
             var ptrColor = ptr.Color;
             Node fixUp;
-            if (ptr.Left == _sentinel)
-            {
+            if (ptr.Left == _sentinel){
                 fixUp = target.Right;
                 Transplant(target, fixUp);
             }
-            else if (ptr.Right == _sentinel)
-            {
+            else if (ptr.Right == _sentinel){
                 fixUp = target.Left;
                 Transplant(target, fixUp);
             }
-            else
-            {
+            else{
                 ptr = GetSuccessor(target);
                 ptrColor = ptr.Color;
                 fixUp = ptr.Right;
                 // in case of sentinel refer to target
                 if (ptr.Parent == target) fixUp.Parent = ptr;
-                else
-                {
+                else{
                     Transplant(ptr, ptr.Right);
                     ptr.Right = target.Right;
                     target.Right.Parent = ptr;
@@ -436,16 +379,12 @@ namespace CSharpLibraries.Algorithms.Structures
             if (ptrColor == Black) DeleteFixUp(fixUp);
         }
 
-        private void DeleteFixUp(Node fixUp)
-        {
-            while (fixUp != Root && fixUp.Color == Black)
-            {
+        private void DeleteFixUp(Node fixUp){
+            while (fixUp != Root && fixUp.Color == Black){
                 Node sibling;
-                if (fixUp == fixUp.Parent.Left)
-                {
+                if (fixUp == fixUp.Parent.Left){
                     sibling = fixUp.Parent.Right;
-                    if (sibling.Color == Red)
-                    {
+                    if (sibling.Color == Red){
                         // case1:sibling is black, convert to case 2, 3 or 4
                         sibling.Color = Black; // , which denote that sibling is black
                         fixUp.Parent.Color = Red;
@@ -453,15 +392,13 @@ namespace CSharpLibraries.Algorithms.Structures
                         sibling = fixUp.Parent.Right;
                     }
 
-                    if (sibling.Left.Color == Black && sibling.Right.Color == Black)
-                    {
+                    if (sibling.Left.Color == Black && sibling.Right.Color == Black){
                         // case2: sibling children is black
                         sibling.Color = Red;
                         fixUp = fixUp.Parent;
                         continue;
                     }
-                    else if (sibling.Right.Color == Black)
-                    {
+                    else if (sibling.Right.Color == Black){
                         // case3: sibling left red, right black. convert case4
                         sibling.Left.Color = Black;
                         sibling.Color = Red;
@@ -474,25 +411,21 @@ namespace CSharpLibraries.Algorithms.Structures
                     sibling.Right.Color = Black;
                     LeftRotate(fixUp.Parent);
                 }
-                else
-                {
+                else{
                     sibling = fixUp.Parent.Left;
-                    if (sibling.Color == Red)
-                    {
+                    if (sibling.Color == Red){
                         sibling.Color = Black;
                         fixUp.Parent.Color = Red;
                         RightRotate(fixUp.Parent);
                         sibling = fixUp.Parent.Left;
                     }
 
-                    if (sibling.Left.Color == Black && sibling.Right.Color == Black)
-                    {
+                    if (sibling.Left.Color == Black && sibling.Right.Color == Black){
                         sibling.Color = Red;
                         fixUp = fixUp.Parent;
                         continue;
                     }
-                    else if (sibling.Left.Color == Black)
-                    {
+                    else if (sibling.Left.Color == Black){
                         sibling.Right.Color = Black;
                         sibling.Color = Red;
                         LeftRotate(sibling);
@@ -511,35 +444,28 @@ namespace CSharpLibraries.Algorithms.Structures
             fixUp.Color = Black;
         }
 
-        private void Transplant(Node a, Node b)
-        {
+        private void Transplant(Node a, Node b){
             if (a.Parent == _sentinel) ResetRoot(b);
-            else if (a.Parent.Right == a)
-            {
+            else if (a.Parent.Right == a){
                 a.Parent.Right = b;
                 b.Parent = a.Parent; // permissible if b is sentinel
             }
-            else
-            {
+            else{
                 a.Parent.Left = b;
                 b.Parent = a.Parent;
             }
         }
 
-        private Node Search(Node n, TKey key)
-        {
-            while (true)
-            {
+        private Node Search(Node n, TKey key){
+            while (true){
                 if (n == _sentinel) return null;
                 if (_kComparator(n.Key, key) == 0)
                     return n;
-                else if (n.Left != _sentinel && _kComparator(n.Key, key) > 0)
-                {
+                else if (n.Left != _sentinel && _kComparator(n.Key, key) > 0){
                     n = n.Left;
                     continue;
                 }
-                else if (n.Right != _sentinel && _kComparator(n.Key, key) < 0)
-                {
+                else if (n.Right != _sentinel && _kComparator(n.Key, key) < 0){
                     n = n.Right;
                     continue;
                 }
@@ -548,8 +474,7 @@ namespace CSharpLibraries.Algorithms.Structures
             }
         }
 
-        private void LeftRotate(Node leftNode)
-        {
+        private void LeftRotate(Node leftNode){
             var rightNode = leftNode.Right;
             //exchange
             leftNode.Right = rightNode.Left;
@@ -565,8 +490,7 @@ namespace CSharpLibraries.Algorithms.Structures
             leftNode.Parent = rightNode;
         }
 
-        private void RightRotate(Node rightNode)
-        {
+        private void RightRotate(Node rightNode){
             // mirror of leftRotate
             var leftNode = rightNode.Left;
             rightNode.Left = leftNode.Right;
@@ -579,12 +503,10 @@ namespace CSharpLibraries.Algorithms.Structures
             rightNode.Parent = leftNode;
         }
 
-        private Node GetMinimum(Node current)
-        {
+        private Node GetMinimum(Node current){
             Node target = null;
             var ptr = current;
-            while (ptr != _sentinel)
-            {
+            while (ptr != _sentinel){
                 target = ptr;
                 ptr = ptr.Left;
             }
@@ -592,12 +514,10 @@ namespace CSharpLibraries.Algorithms.Structures
             return target;
         }
 
-        private Node GetMaximum(Node current)
-        {
+        private Node GetMaximum(Node current){
             Node target = null;
             var ptr = current;
-            while (ptr != _sentinel)
-            {
+            while (ptr != _sentinel){
                 target = ptr;
                 ptr = ptr.Right;
             }
@@ -605,15 +525,12 @@ namespace CSharpLibraries.Algorithms.Structures
             return target;
         }
 
-        private Node GetSuccessor(Node current)
-        {
+        private Node GetSuccessor(Node current){
             if (current.Right != _sentinel) return GetMinimum(current.Right);
-            else
-            {
+            else{
                 var target = current.Parent;
                 var targetRight = current;
-                while (target != _sentinel && target!.Right == targetRight)
-                {
+                while (target != _sentinel && target!.Right == targetRight){
                     targetRight = target;
                     target = target.Parent;
                 }
@@ -623,15 +540,12 @@ namespace CSharpLibraries.Algorithms.Structures
         }
 
         // ReSharper disable once UnusedMember.Local
-        private Node GetPredecessor(Node current)
-        {
+        private Node GetPredecessor(Node current){
             if (current.Left != _sentinel) return GetMaximum(current.Left);
-            else
-            {
+            else{
                 var target = current.Parent;
                 var targetLeft = current;
-                while (target != _sentinel && target!.Left == targetLeft)
-                {
+                while (target != _sentinel && target!.Left == targetLeft){
                     targetLeft = target;
                     target = target.Parent;
                 }

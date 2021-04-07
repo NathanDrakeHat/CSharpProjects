@@ -2,12 +2,9 @@
 using System.Globalization;
 using System.Numerics;
 
-namespace CSharpLibraries.Interpreters
-{
-    public class ComplexFormatter :IFormatProvider, ICustomFormatter
-    {
-        public object GetFormat(Type formatType)
-        {
+namespace CSharpLibraries.Interpreters{
+    public class ComplexFormatter : IFormatProvider, ICustomFormatter{
+        public object GetFormat(Type formatType){
             if (formatType == typeof(ICustomFormatter))
                 return this;
             else
@@ -15,11 +12,8 @@ namespace CSharpLibraries.Interpreters
         }
 
         public string Format(string format, object arg,
-            IFormatProvider provider)
-        {
-            if (arg is Complex c1)
-            {
-                
+            IFormatProvider provider){
+            if (arg is Complex c1){
                 if (format.Equals("I"))
                     return c1.Real + " + " + c1.Imaginary + "i";
                 else if (format.Equals("J"))
@@ -27,8 +21,7 @@ namespace CSharpLibraries.Interpreters
                 else
                     return c1.ToString(format, provider);
             }
-            else
-            {
+            else{
                 if (arg is IFormattable formattable)
                     return formattable.ToString(format, provider);
                 else if (arg != null)

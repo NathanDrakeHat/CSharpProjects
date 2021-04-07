@@ -2,35 +2,26 @@
 using System.Numerics;
 using static CSharpLibraries.Interpreters.InterpretersExceptions;
 
-namespace CSharpLibraries.Interpreters
-{
-    internal static class NumericOperators
-    {
-        
-        internal static double Value(object o)
-        {
-            return o switch
-            {
+namespace CSharpLibraries.Interpreters{
+    internal static class NumericOperators{
+        internal static double Value(object o){
+            return o switch{
                 double d => d,
                 int i => i,
                 _ => throw new SyntaxException("not number")
             };
         }
-        
-        internal static bool LessThan(object a, object b)
-        {
+
+        internal static bool LessThan(object a, object b){
             return Value(a) < Value(b);
         }
 
-        internal static bool Equal(object a, object b)
-        {
+        internal static bool ValueEqual(object a, object b){
             return Math.Abs(Value(a) - Value(b)) < double.Epsilon;
         }
 
-        internal static object Negative(object a)
-        {
-            return a switch
-            {
+        internal static object Negative(object a){
+            return a switch{
                 int i => -i,
                 double d => -d,
                 Complex c => new Complex(-c.Real, -c.Imaginary),
@@ -38,10 +29,8 @@ namespace CSharpLibraries.Interpreters
             };
         }
 
-        internal static object Plus(object a, object b)
-        {
-            return a switch
-            {
+        internal static object Plus(object a, object b){
+            return a switch{
                 int c when b is int e => c + e,
                 int c when b is double d => c + d,
                 int c when b is Complex cx => Complex.Add(cx, c),
@@ -57,10 +46,8 @@ namespace CSharpLibraries.Interpreters
             };
         }
 
-        internal static object Minus(object a, object b)
-        {
-            return a switch
-            {
+        internal static object Minus(object a, object b){
+            return a switch{
                 int c when b is int e => c - e,
                 int c when b is double d => c - d,
                 int c when b is Complex cx => Complex.Add(c, Complex.Negate(cx)),
@@ -76,10 +63,8 @@ namespace CSharpLibraries.Interpreters
             };
         }
 
-        internal static object Divide(object a, object b)
-        {
-            return a switch
-            {
+        internal static object Divide(object a, object b){
+            return a switch{
                 int c when b is int e => c / e,
                 int c when b is double d => c / d,
                 int c when b is Complex cx => Complex.Divide(c, cx),
@@ -95,10 +80,8 @@ namespace CSharpLibraries.Interpreters
             };
         }
 
-        internal static object Multiply(object a, object b)
-        {
-            return a switch
-            {
+        internal static object Multiply(object a, object b){
+            return a switch{
                 int c when b is int e => c * e,
                 int c when b is double d => c * d,
                 int c when b is Complex cx => Complex.Multiply(c, cx),

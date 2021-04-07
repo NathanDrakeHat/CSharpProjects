@@ -1,16 +1,13 @@
-﻿namespace CSharpLibraries.Algorithms.Structures
-{
+﻿namespace CSharpLibraries.Algorithms.Structures{
     /// <summary>
     /// extends or initial as a public field
     /// </summary>
-    public class DisjointSet
-    {
-        private int Rank { set; get; }
+    public class DisjointSet{
+        private int Rank{ set; get; }
 
-        private DisjointSet Parent { set; get; }
+        private DisjointSet Parent{ set; get; }
 
-        protected DisjointSet()
-        {
+        protected DisjointSet(){
             Parent = this;
         }
 
@@ -19,10 +16,8 @@
         /// </summary>
         /// <param name="x">element</param>
         /// <returns>identifier of the set of an element</returns>
-        public static DisjointSet FindSet(DisjointSet x)
-        {
-            if (!ReferenceEquals(x, x.Parent))
-            {
+        public static DisjointSet FindSet(DisjointSet x){
+            if (!ReferenceEquals(x, x.Parent)){
                 x.Parent = FindSet(x.Parent);
             }
 
@@ -31,17 +26,13 @@
 
         public static void Union(DisjointSet a, DisjointSet b) => Link(FindSet(a), FindSet(b));
 
-        private static void Link(DisjointSet x, DisjointSet y)
-        {
-            if (x.Rank > y.Rank)
-            {
+        private static void Link(DisjointSet x, DisjointSet y){
+            if (x.Rank > y.Rank){
                 y.Parent = x;
             }
-            else
-            {
+            else{
                 x.Parent = y;
-                if (x.Rank == y.Rank)
-                {
+                if (x.Rank == y.Rank){
                     y.Rank += 1;
                 }
             }

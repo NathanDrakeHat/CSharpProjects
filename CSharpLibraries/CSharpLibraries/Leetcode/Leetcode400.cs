@@ -1,8 +1,6 @@
 ﻿#nullable disable
-namespace CSharpLibraries.Leetcode
-{
-    public static class Leetcode400
-    {
+namespace CSharpLibraries.Leetcode{
+    public static class Leetcode400{
         /// <summary>
         /// #376
         /// <br/>最长摆动序列
@@ -18,32 +16,26 @@ namespace CSharpLibraries.Leetcode
         /// </summary>
         /// <param name="nums"></param>
         /// <returns></returns>
-        public static int WiggleMaxLength(int[] nums)
-        {
-            if (nums.Length < 2)
-            {
+        public static int WiggleMaxLength(int[] nums){
+            if (nums.Length < 2){
                 return nums.Length;
             }
 
             Gradient grad = Gradient.Level;
             int res = 1;
-            
-            if (nums[0] < nums[1])
-            {
+
+            if (nums[0] < nums[1]){
                 res++;
                 grad = Gradient.Ascend;
             }
-            else if (nums[0] > nums[1])
-            {
+            else if (nums[0] > nums[1]){
                 res++;
                 grad = Gradient.Descend;
             }
-            
-            for (int i = 2; i < nums.Length; i++)
-            {
+
+            for (int i = 2; i < nums.Length; i++){
                 var t = GetGradient(nums[i - 1], nums[i]);
-                if (t != Gradient.Level && grad != t)
-                {
+                if (t != Gradient.Level && grad != t){
                     res++;
                     grad = t;
                 }
@@ -51,25 +43,20 @@ namespace CSharpLibraries.Leetcode
 
             return res;
 
-            static Gradient GetGradient(int first, int second)
-            {
-                if (first == second)
-                {
+            static Gradient GetGradient(int first, int second){
+                if (first == second){
                     return Gradient.Level;
                 }
-                else if (first < second)
-                {
+                else if (first < second){
                     return Gradient.Ascend;
                 }
-                else
-                {
+                else{
                     return Gradient.Descend;
                 }
             }
         }
 
-        private enum Gradient
-        {
+        private enum Gradient{
             Ascend,
             Level,
             Descend

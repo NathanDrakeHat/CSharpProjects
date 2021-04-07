@@ -3,42 +3,35 @@ using System;
 using System.Collections.Generic;
 using static CSharpLibraries.Utils.Extension;
 
-namespace CSharpLibraries.Algorithms.Graph
-{
-    public enum GraphDirection
-    {
+namespace CSharpLibraries.Algorithms.Graph{
+    public enum GraphDirection{
         Directed,
         NonDirected
     }
 
-    public sealed class LinkedGraph<TVertex>
-    {
+    public sealed class LinkedGraph<TVertex>{
         #region InnerClass
 
-        public sealed class Edge
-        {
+        public sealed class Edge{
             public readonly TVertex FormerVertex;
             public readonly TVertex LaterVertex;
             private readonly GraphDirection _edgeGraphDirection;
-            public double Weight { get; internal set; }
+            public double Weight{ get; internal set; }
 
-            internal Edge(TVertex former, TVertex later, double weight, GraphDirection isDirected)
-            {
+            internal Edge(TVertex former, TVertex later, double weight, GraphDirection isDirected){
                 Weight = weight;
                 FormerVertex = former;
                 LaterVertex = later;
                 _edgeGraphDirection = isDirected;
             }
 
-            public TVertex AnotherSide(TVertex vertex)
-            {
+            public TVertex AnotherSide(TVertex vertex){
                 if (vertex.Equals(FormerVertex)) return LaterVertex;
                 else if (vertex.Equals(LaterVertex)) return FormerVertex;
                 else throw new ArgumentException("Arg vertex not in this edge.", nameof(vertex));
             }
 
-            public override string ToString()
-            {
+            public override string ToString(){
                 if (_edgeGraphDirection == GraphDirection.Directed)
                     return $"[Edge({FormerVertex} >>> {LaterVertex})], weight:{Weight}";
                 else
@@ -50,20 +43,18 @@ namespace CSharpLibraries.Algorithms.Graph
 
         #region Fields
 
-        public int Size { get; private set; }
+        public int Size{ get; private set; }
         private readonly GraphDirection _graphGraphDirection;
         private readonly List<TVertex> _vertices = new List<TVertex>();
         private readonly Dictionary<TVertex, List<Edge>> _edgesMap = new Dictionary<TVertex, List<Edge>>();
 
         #endregion
 
-        public LinkedGraph(IEnumerable<TVertex> vertices, GraphDirection isDirected)
-        {
+        public LinkedGraph(IEnumerable<TVertex> vertices, GraphDirection isDirected){
             vertices.RequireNotNullArg(nameof(vertices));
             Size = 0;
-            foreach (var vertex in vertices)
-            {
-                if(vertex == null) throw new ArgumentException("null element in container",nameof(vertices));
+            foreach (var vertex in vertices){
+                if (vertex == null) throw new ArgumentException("null element in container", nameof(vertices));
                 _edgesMap[vertex] = new List<Edge>();
                 _vertices.Add(vertex);
                 Size++;
@@ -72,16 +63,14 @@ namespace CSharpLibraries.Algorithms.Graph
             _graphGraphDirection = isDirected;
         }
 
-        public LinkedGraph(LinkedGraph<TVertex> otherGraph)
-        {
+        public LinkedGraph(LinkedGraph<TVertex> otherGraph){
             otherGraph.RequireNotNullArg(nameof(otherGraph));
             Size = otherGraph._vertices.Count;
             _graphGraphDirection = otherGraph._graphGraphDirection;
             _vertices.AddRange(otherGraph._vertices);
             AddTo(otherGraph._edgesMap, _edgesMap);
 
-            static void AddTo<Tk, Tv>(Dictionary<Tk, Tv> dictionary1, Dictionary<Tk, Tv> dictionary2)
-            {
+            static void AddTo<Tk, Tv>(Dictionary<Tk, Tv> dictionary1, Dictionary<Tk, Tv> dictionary2){
                 foreach (var entry in dictionary1)
                     dictionary2[entry.Key] = entry.Value;
             }
@@ -89,18 +78,15 @@ namespace CSharpLibraries.Algorithms.Graph
 
         #region Methods
 
-        public void SetNeighbor(TVertex vertex, TVertex neighbor, double w = 1.0)
-        {
+        public void SetNeighbor(TVertex vertex, TVertex neighbor, double w = 1.0){
             if (vertex == null) throw new ArgumentNullException(nameof(vertex));
             if (neighbor == null) throw new ArgumentNullException(nameof(neighbor));
             var edgeT = new Edge(vertex, neighbor, w, _graphGraphDirection);
-            if (_graphGraphDirection == GraphDirection.Directed)
-            {
+            if (_graphGraphDirection == GraphDirection.Directed){
                 var edgesList = _edgesMap[vertex];
                 edgesList.Add(edgeT);
             }
-            else
-            {
+            else{
                 var edgesList = _edgesMap[vertex];
                 edgesList.Add(edgeT);
 
@@ -109,8 +95,7 @@ namespace CSharpLibraries.Algorithms.Graph
             }
         }
 
-        public void AddVertex(TVertex vertex)
-        {
+        public void AddVertex(TVertex vertex){
             if (vertex == null) throw new ArgumentNullException(nameof(vertex));
             if (_vertices.Contains(vertex) || _edgesMap.ContainsKey(vertex))
                 throw new InvalidOperationException("Duplicate vertex.");
@@ -119,8 +104,7 @@ namespace CSharpLibraries.Algorithms.Graph
             _edgesMap[vertex] = new List<Edge>();
         }
 
-        public List<Edge> AllEdges()
-        {
+        public List<Edge> AllEdges(){
             var res = new List<Edge>();
             foreach (var vertex in _vertices)
                 res.AddRange(_edgesMap[vertex]);

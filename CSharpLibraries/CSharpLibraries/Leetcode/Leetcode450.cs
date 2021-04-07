@@ -1,7 +1,4 @@
-﻿namespace CSharpLibraries.Leetcode
-{
-    public class Leetcode450
-    {
-        
+﻿namespace CSharpLibraries.Leetcode{
+    public class Leetcode450{
     }
 }

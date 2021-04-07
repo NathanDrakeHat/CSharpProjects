@@ -1,41 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CSharpLibraries.Interpreters
-{
-    internal sealed class Symbol
-    {
+namespace CSharpLibraries.Interpreters{
+    internal sealed class Symbol{
         public readonly string Value;
 
-        public Symbol(string s)
-        {
+        public Symbol(string s){
             this.Value = s;
         }
 
-        public override bool Equals(object o)
-        {
-            if (o == this)
-            {
+        public override bool Equals(object o){
+            if (o == this){
                 return true;
             }
 
-            if (o is Symbol symbol)
-            {
+            if (o is Symbol symbol){
                 return Value.Equals(symbol.Value);
             }
-            else
-            {
+            else{
                 return false;
             }
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode(){
             return HashCode.Combine(Value, typeof(Symbol));
         }
 
-        public override string ToString()
-        {
+        public override string ToString(){
             return Value;
         }
 
@@ -51,8 +42,7 @@ namespace CSharpLibraries.Interpreters
         internal static readonly Symbol SymUnquoteSplicing = new Symbol("unquote-splicing");
         internal static readonly Symbol SymEof = new Symbol("#<symbol-eof>");
 
-        internal static readonly Dictionary<string, Symbol> QuotesDict = new()
-        {
+        internal static readonly Dictionary<string, Symbol> QuotesDict = new(){
             {"'", SymQuote},
             {"`", SymQuasiQuote},
             {",", SymUnquote},
