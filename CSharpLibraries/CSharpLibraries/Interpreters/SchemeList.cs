@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using static CSharpLibraries.Interpreters.Lisp;
+using static CSharpLibraries.Interpreters.LispInterpreter;
 
 namespace CSharpLibraries.Interpreters
 {

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using CSharpLibraries.Interpreters;
 using NUnit.Framework;
-using static CSharpLibraries.Interpreters.Lisp;
+using static CSharpLibraries.Interpreters.LispInterpreter;
 
 namespace CSharpLibrariesTest.Interpreters
 {
     public static class SchemeTest
     {
 
-        private static readonly Lisp Interpreter = new();
+        private static readonly LispInterpreter Interpreter = new();
         
         [Test]
         public static void ParseTest()
@@ -28,7 +28,7 @@ namespace CSharpLibrariesTest.Interpreters
                         "*", "r", "r"
                     }
                 }
-            },Parse("(begin (define r 10) (* pi (* r r)))"));
+            },Interpreter.Parse("(begin (define r 10) (* pi (* r r)))"));
         }
         
         [Test]

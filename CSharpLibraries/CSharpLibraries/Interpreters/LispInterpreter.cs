@@ -1,22 +1,25 @@
 ﻿#nullable disable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using static CSharpLibraries.Interpreters.InterpretersExceptions;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-using static CSharpLibraries.Interpreters.Env;
+using System.Text;
+using System.Text.RegularExpressions;
+using Lambda = System.Func<System.Collections.Generic.List<object>, object>;
+using static CSharpLibraries.Interpreters.Environment;
 
 [assembly: InternalsVisibleTo("CSarpLibrariesTest")]
 
 namespace CSharpLibraries.Interpreters
 {
-    public sealed class Lisp
+    public sealed class LispInterpreter
     {
         internal static readonly IList<object> Nil = new List<object>(0);
 
-        private readonly Env _globalEnv = StandardEnv();
+        private readonly Environment _globalEnv = StandardEnv();
 
         public object RunScheme(string program) => Eval(Parse(program));
 
@@ -62,11 +65,11 @@ namespace CSharpLibraries.Interpreters
             // ReSharper disable once FunctionNeverReturns
         }
 
-        public static object Parse(string program) => ParseTokens(Tokenize(program));
+        public object Parse(string program) => ParseTokens(Tokenize(program));
 
         private object Eval(object x) => Eval(x, _globalEnv);
 
-        private static object Eval(object x, Env currentEnv)
+        private static object Eval(object x, Environment currentEnv)
         {
             if (x is string)
             {
@@ -97,7 +100,7 @@ namespace CSharpLibraries.Interpreters
                 case "lambda":
                     IEnumerable<object> parameters = (IEnumerable<object>) args[0];
                     object body = args[1];
-                    return new Lambda(arguments => Eval(body, new Env(parameters, arguments, currentEnv)));
+                    return new Lambda(arguments => Eval(body, new Environment(parameters, arguments, currentEnv)));
                 default:
                     Lambda proc = (Lambda) Eval(op, currentEnv);
                     List<object> vals = args.Select(arg => Eval(arg, currentEnv)).ToList();
@@ -118,7 +121,7 @@ namespace CSharpLibraries.Interpreters
         /// <param name="tokens">list of tokens</param>
         /// <returns></returns>
         /// <exception cref="SyntaxException"></exception>
-        private static object ParseTokens(Queue<string> tokens)
+        private object ParseTokens(Queue<string> tokens)
         {
             if (tokens.Count == 0) throw new SyntaxException("unexpected EOF");
             var token = tokens.Dequeue();
@@ -147,7 +150,7 @@ namespace CSharpLibraries.Interpreters
         /// </summary>
         /// <param name="program">string</param>
         /// <returns>tokens list</returns>
-        private static Queue<string> Tokenize(string program)
+        private Queue<string> Tokenize(string program)
         {
             var t = program.Replace("(", " ( ").Replace(")", " ) ").Split().ToList();
             t.RemoveAll(s => s.Equals(""));
@@ -160,7 +163,7 @@ namespace CSharpLibraries.Interpreters
             return res;
         }
 
-        private static object ToAtom(string x)
+        private object ToAtom(string x)
         {
             bool succ = int.TryParse(x, out int t);
             if (!succ)
@@ -178,6 +181,51 @@ namespace CSharpLibraries.Interpreters
             else
             {
                 return t;
+            }
+        }
+
+        internal static string EvalToString(object x)
+        {
+            if (x == null)
+            {
+                return null;
+            }
+            else if (x.Equals(true))
+            {
+                return "#t";
+            }
+            else if (x.Equals(false))
+            {
+                return "#f";
+            }
+            else switch (x)
+            {
+                case Symbol symX:
+                    return symX.ToString();
+                case String strX:
+                    return Regex.Unescape(strX);
+                case List<object> lx:
+                {
+                    var s = new StringBuilder("(");
+                    foreach (var i in lx)
+                    {
+                        s.Append(EvalToString(i));
+                        s.Append(' ');
+                    }
+
+                    if (lx.Count >= 1)
+                    {
+                        s.Remove(s.Length - 1, 1);
+                    }
+
+                    s.Append(')');
+                    return s.ToString();
+                }
+                case Complex comX:
+                    // TODO formatter
+                    return comX.ToString();
+                default:
+                    return x.ToString();
             }
         }
 

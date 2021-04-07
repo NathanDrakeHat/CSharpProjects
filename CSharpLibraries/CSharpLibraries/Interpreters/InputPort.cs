@@ -53,7 +53,7 @@ namespace CSharpLibraries.Interpreters
                 var matcher = Pattern.Match(_line);
                 while (matcher.Success)
                 {
-                    var token = matcher.Value;
+                    var token = matcher.Groups[1].Value;
                     if (!token.StartsWith(";"))
                     {
                         Queue.Enqueue(token);
