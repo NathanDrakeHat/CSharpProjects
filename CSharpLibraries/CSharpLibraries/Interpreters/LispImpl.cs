@@ -422,25 +422,46 @@ namespace CSharpLibraries.Interpreters{
             IList<object> x = new List<object>{SymLet};
             x.Add(args);
             Require(x, x.Count > 1);
-            IList<IList<object>> bindings;
-            try{
-                bindings = (IList<IList<object>>) args[0];
-            }
-            catch (InvalidCastException){
-                throw new InvalidCastException("illegal binding list");
+            IList<object> bindings = (IList<object>) args[0];
+            if (!LetBindingCheckPass(bindings)){
+                throw new SyntaxException("illegal binding list");
             }
 
             IList<object> body = args.Skip(1).ToList();
-            Require(x, bindings.All(b => b != null &&
+            Require(x, bindings.Cast<List<object>>().All(b => b != null &&
                                          b.Count == 2 &&
                                          b[0] is Symbol), "illegal binding list");
-            IList<object> vars = bindings.Select(l => l[0]).ToList();
-            IList<object> vals = bindings.Select(l => l[1]).ToList();
+            IList<object> vars = bindings.Cast<List<object>>().Select(l => l[0]).ToList();
+            IList<object> vals = bindings.Cast<List<object>>().Select(l => l[1]).ToList();
             var t = new List<object>{SymLambda, vars};
             t.AddRange(body.Select(i => interpreter.Expand(i)).ToList());
             var r = new List<object>{t};
             r.AddRange(vals.Select(i => interpreter.Expand(i)).ToList());
             return r;
+        }
+
+        private static bool LetBindingCheckPass(object o){
+            if (o is IList<object> l1){
+                if (l1.Count > 0){
+                    foreach (var l1Elem in l1){
+                        if (l1Elem is IList<object> l2){
+                            foreach (var l2Elem in l2){
+                                if (l2Elem is IList<object>){
+                                    return false;
+                                }
+                            }
+                        }
+                        else{
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         internal static object Callcc(Lambda proc){
