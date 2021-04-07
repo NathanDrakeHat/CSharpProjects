@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using static CSharpLibraries.Interpreters.LispInterpreter;
@@ -40,7 +39,7 @@ namespace CSharpLibraries.Interpreters
             _outer = outer;
         }
 
-        internal Environment(IEnumerable<DictionaryEntry> entries)
+        private Environment(IEnumerable<DictionaryEntry> entries)
         {
             foreach (var entry in entries)
             {
