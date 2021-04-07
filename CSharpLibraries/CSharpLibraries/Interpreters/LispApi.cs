@@ -7,10 +7,10 @@ namespace CSharpLibraries.Interpreters{
         public void Repl(){
             const string prompt = "lisp>";
             InputPort inPort = new InputPort(Console.In);
-            Console.Out.WriteLine("Lispy version 2.0");
+            Console.WriteLine("Lispy version 2.0");
             while (true){
                 try{
-                    Console.Out.Write(prompt);
+                    Console.Write(prompt);
                     var x = Parse(inPort);
                     if (x == null){
                         continue;
@@ -22,7 +22,7 @@ namespace CSharpLibraries.Interpreters{
                     EvalAndPrint(x);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.Source);
+                    Console.Error.WriteLine(e.Message);
                 }
             }
             // ReSharper disable once FunctionNeverReturns
@@ -43,7 +43,7 @@ namespace CSharpLibraries.Interpreters{
                     EvalAndPrint(x);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.Source);
+                    Console.Error.WriteLine(e.Message);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace CSharpLibraries.Interpreters{
                     Eval(x, _globalEnv);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.Source);
+                    Console.Error.WriteLine(e.Message);
                 }
             }
         }

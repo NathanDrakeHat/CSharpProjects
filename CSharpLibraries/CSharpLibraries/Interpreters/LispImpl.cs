@@ -81,7 +81,7 @@ namespace CSharpLibraries.Interpreters{
         private void EvalAndPrint(object x) {
             var val = Eval(x, _globalEnv);
             if (val != null) {
-                Console.Out.WriteLine(EvalToString(val));
+                Console.WriteLine(EvalToString(val));
             }
         }
         

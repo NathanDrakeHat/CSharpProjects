@@ -249,14 +249,14 @@ namespace CSharpLibraries.Interpreters{
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return (args[0] is int) || (args[0] is double) || (args[0] is Complex);
                 })),
-                new(new Symbol("print"), new Lambda(args => {
-                    if (args.Count != 1){
-                        throw new ArgumentsCountException("1");
-                    }
-
-                    Console.Out.WriteLine(EvalToString(args[0]));
-                    return null;
-                })),
+                // new(new Symbol("print"), new Lambda(args => {
+                //     if (args.Count != 1){
+                //         throw new ArgumentsCountException("1");
+                //     }
+                //
+                //     Console.WriteLine(EvalToString(args[0]));
+                //     return null;
+                // })),
                 new(new Symbol("procedure?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
                     return args[0] is Procedure;
@@ -336,8 +336,7 @@ namespace CSharpLibraries.Interpreters{
                         if (args.Count != 1){
                             throw new ArgumentsCountException("1");
                         }
-
-                        Console.Out.WriteLine(EvalToString(args[0]));
+                        Console.WriteLine(EvalToString(args[0]));
                         return null;
                     })),
                 new(new Symbol("port?"), new Lambda(

@@ -18,6 +18,8 @@
     <ItemGroup>
       <None Include="bin\Debug\net5.0\functions.ss" />
       <None Include="bin\Debug\net5.0\lispytest.ss" />
+      <None Include="bin\Release\net5.0\functions.ss" />
+      <None Include="bin\Release\net5.0\lispytest.ss" />
     </ItemGroup>
 
 </Project>
