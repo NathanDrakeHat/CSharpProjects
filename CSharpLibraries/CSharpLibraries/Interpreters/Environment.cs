@@ -17,17 +17,19 @@ namespace CSharpLibraries.Interpreters{
             if (parameters is Symbol){
                 this[parameters] = args;
             }
-
-            var p = (IEnumerable<object>) parameters;
-            if (args.Count() == p.Count()){
-                using var pi = p.GetEnumerator();
-                using var ai = args.GetEnumerator();
-                while (pi.MoveNext()){
-                    this[pi.Current] = ai.Current;
-                }
-            }
             else{
-                throw new TypeException($"expected {EvalToString(parameters)}, given {EvalToString(args)}");
+                var p = (IEnumerable<object>) parameters;
+                if (args.Count() == p.Count()){
+                    using var pi = p.GetEnumerator();
+                    using var ai = args.GetEnumerator();
+                    while (pi.MoveNext() && ai.MoveNext()){
+                        if (pi.Current == null) throw new Exception();
+                        this[pi.Current] = ai.Current;
+                    }
+                }
+                else{
+                    throw new TypeException($"expected {EvalToString(parameters)}, given {EvalToString(args)}");
+                }
             }
 
             _outer = outer;
@@ -41,12 +43,7 @@ namespace CSharpLibraries.Interpreters{
             _outer = null;
         }
 
-        internal Environment Find(object variable){
-
-#if DEBUG
-            Console.Out.WriteLineAsync($"find symbol: <{variable}> in {variable.GetHashCode()}").Wait();
-#endif
-            
+        internal Environment FindEnv(object variable){
             if (ContainsKey(variable)){
                 return this;
             }
@@ -54,7 +51,7 @@ namespace CSharpLibraries.Interpreters{
                 throw new LookUpException(variable.ToString());
             }
             else{
-                return _outer.Find(variable);
+                return _outer.FindEnv(variable);
             }
         }
 
@@ -204,20 +201,14 @@ namespace CSharpLibraries.Interpreters{
                 })),
                 new(new Symbol("list"), new Lambda(args => {
                     if (args.Count < 1){
-                        return new SchemeList(Nil);
+                        throw new ArgumentsCountException(">=1");
                     }
 
-                    var res = new SchemeList(args[0]);
-                    var p = res;
-                    for (int i = 1; i < args.Count; i++){
-                        p = p.ChainAdd(args[i]);
-                    }
-
-                    return res;
+                    return new List<object>(args);
                 })),
                 new(new Symbol("list?"), new Lambda(args => {
                     if (args.Count != 1) throw new ArgumentsCountException("1");
-                    return new List<object>(args);
+                    return args[0] is IList<object>;
                 })),
                 new(new Symbol("map"), new Lambda(args => {
                     if (args.Count < 2) throw new ArgumentsCountException(">=2");
@@ -226,10 +217,12 @@ namespace CSharpLibraries.Interpreters{
                     IList<object> r = new List<object>(((IList<object>) lists[0]).Count);
                     while (true){
                         IList<object> vals = new List<object>(lists.Count);
-                        int i = 0;
-                        foreach (var list in lists.Cast<IList<object>>().Where(list => !ObjectIsNil(list))){
-                            vals.Add(list[0]);
-                            lists[i++] = list.Skip(1).ToList();
+                        for (int i = 0; i < lists.Count; i++){
+                            if (!ObjectIsNil(lists[i])){
+                                var list = (IList<object>) lists[i];
+                                vals.Add(list[0]);
+                                lists[i] = list.Skip(1).ToList();
+                            }
                         }
 
                         if (vals.Count == lists.Count){
@@ -261,7 +254,7 @@ namespace CSharpLibraries.Interpreters{
                         throw new ArgumentsCountException("1");
                     }
 
-                    Console.Out.WriteLineAsync(EvalToString(args[0])).Wait();
+                    Console.Out.WriteLine(EvalToString(args[0]));
                     return null;
                 })),
                 new(new Symbol("procedure?"), new Lambda(args => {
@@ -344,7 +337,7 @@ namespace CSharpLibraries.Interpreters{
                             throw new ArgumentsCountException("1");
                         }
 
-                        Console.Out.WriteLineAsync(EvalToString(args[0])).Wait();
+                        Console.Out.WriteLine(EvalToString(args[0]));
                         return null;
                     })),
                 new(new Symbol("port?"), new Lambda(

@@ -59,7 +59,7 @@ namespace CSharpLibraries.Interpreters{
 
         private static void LoadLib(string fileName, Lisp interpreter){
             var file = new FileInfo(fileName);
-            var inPort = new InputPort(file);
+            using var inPort = new InputPort(file);
             while (true){
                 try{
                     var x = interpreter.Parse(inPort);
@@ -73,7 +73,7 @@ namespace CSharpLibraries.Interpreters{
                     Eval(x, interpreter._globalEnv);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLineAsync(e.StackTrace).Wait();
+                    Console.Error.WriteLine(e.StackTrace);
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace CSharpLibraries.Interpreters{
         private void EvalAndPrint(object x) {
             var val = Eval(x, _globalEnv);
             if (val != null) {
-                Console.Out.WriteLineAsync(EvalToString(val)).Wait();
+                Console.Out.WriteLine(EvalToString(val));
             }
         }
         
@@ -99,11 +99,11 @@ namespace CSharpLibraries.Interpreters{
             switch (input){
                 case string sInput:{
                     var t = Read(new InputPort(sInput));
-                    return interpreter.Expand(t);
+                    return interpreter.Expand(t, true);
                 }
                 case InputPort portInput:{
                     var t = Read(portInput);
-                    return interpreter.Expand(t);
+                    return interpreter.Expand(t, true);
                 }
                 default:
                     throw new Exception("unknown error");
@@ -180,7 +180,7 @@ namespace CSharpLibraries.Interpreters{
         internal static object Eval(object x, Environment currentEnv){
             while (true){
                 if (x is Symbol){
-                    return currentEnv.Find(x)[x];
+                    return currentEnv.FindEnv(x)[x];
                 }
                 else if (!(x is IList<object>)){
                     return x;
@@ -201,7 +201,7 @@ namespace CSharpLibraries.Interpreters{
                 else if (op.Equals(SymSet)){
                     var v = l[1];
                     var exp = l[2];
-                    currentEnv.Find(v)[v] = Eval(exp, currentEnv);
+                    currentEnv.FindEnv(v)[v] = Eval(exp, currentEnv);
                     return null;
                 }
                 else if (op.Equals(SymDefine)){
@@ -216,7 +216,9 @@ namespace CSharpLibraries.Interpreters{
                     return new Procedure(vars, exp, currentEnv);
                 }
                 else if (op.Equals(SymBegin)){
-                    foreach (var exp in l.Skip(1).ToList()) Eval(exp, currentEnv);
+                    foreach (var exp in l.Skip(1).Take(l.Count - 2)){
+                        Eval(exp, currentEnv);
+                    }
                     x = l[^1];
                 }
                 else{
@@ -234,7 +236,7 @@ namespace CSharpLibraries.Interpreters{
             }
         }
 
-        private object Expand(object x, bool topLevel = true){
+        private object Expand(object x, bool topLevel = false){
             Require(x, !ObjectIsNil(x));
             if (!(x is IList<object>)){
                 return x;
@@ -258,7 +260,7 @@ namespace CSharpLibraries.Interpreters{
                 Require(x, l.Count == 3);
                 var v = l[1];
                 Require(x, v is Symbol, "can set! only a symbol");
-                return new List<object>(){SymSet, v, Expand(l[2])};
+                return new List<object>{SymSet, v, Expand(l[2])};
             }
             else if (op.Equals(SymDefine) || op.Equals(SymDefineMacro)){
                 Require(x, l.Count >= 3);
@@ -287,12 +289,7 @@ namespace CSharpLibraries.Interpreters{
                 }
             }
             else if (op.Equals(SymBegin)){
-                if (l.Count == 1){
-                    return null;
-                }
-                else{
-                    return l.Select(i => Expand(i, topLevel)).ToList();
-                }
+                return l.Count == 1 ? null : l.Select(i => Expand(i, topLevel)).ToList();
             }
             else if (op.Equals(SymLambda)){
                 Require(x, l.Count >= 3);
@@ -354,11 +351,6 @@ namespace CSharpLibraries.Interpreters{
             if (!predicate){
                 throw new SyntaxException(EvalToString(x) + m);
             }
-        }
-
-        private static string ReadLine(string prompt){
-            Console.Out.WriteLineAsync(prompt).Wait();
-            return Console.ReadLine();
         }
         
         internal static string EvalToString(object x){

@@ -32,71 +32,176 @@ namespace CSharpLibraries.Interpreters{
         }
 
         internal static object Plus(object a, object b){
-            return a switch{
-                int c when b is int e => c + e,
-                int c when b is double d => c + d,
-                int c when b is Complex cx => Complex.Add(cx, c),
-                int => throw new InvalidCastException(),
-                double e when b is int f => e + f,
-                double e when b is double d => e + d,
-                double e when b is Complex cx => Complex.Add(cx, e),
-                double => throw new InvalidCastException(),
-                Complex cx when b is int e => Complex.Add(cx, e),
-                Complex cx when b is double d => Complex.Add(cx, d),
-                Complex cx when b is Complex cx1 => Complex.Add(cx, cx1),
-                _ => throw new InvalidCastException()
-            };
+            if (a is int ia){
+                if (b is int ib){
+                    return ia + ib;
+                }
+                else if (b is double db){
+                    return ia + db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ia + cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is double da){
+                if (b is int ib){
+                    return da + ib;
+                }
+                else if (b is double db){
+                    return da + db;
+                }
+                else if(b is Complex cb)
+                {
+                    return da + cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is Complex ca){
+                if (b is int ib){
+                    return ca + ib;
+                }
+                else if (b is double db){
+                    return ca + db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ca + cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            throw new SyntaxException("not number");
+            
         }
 
         internal static object Minus(object a, object b){
-            return a switch{
-                int c when b is int e => c - e,
-                int c when b is double d => c - d,
-                int c when b is Complex cx => Complex.Add(c, Complex.Negate(cx)),
-                int => throw new InvalidCastException(),
-                double e when b is int f => e - f,
-                double e when b is double d => e - d,
-                double e when b is Complex cx => Complex.Add(e, Complex.Negate(cx)),
-                double => throw new InvalidCastException(),
-                Complex cx when b is int e => Complex.Negate(Complex.Add(Complex.Negate(cx), e)),
-                Complex cx when b is double d => Complex.Negate(Complex.Add(Complex.Negate(cx), d)),
-                Complex cx when b is Complex cx1 => Complex.Negate(Complex.Add(Complex.Negate(cx), cx1)),
-                _ => throw new InvalidCastException()
-            };
+            if (a is int ia){
+                if (b is int ib){
+                    return ia - ib;
+                }
+                else if (b is double db){
+                    return ia - db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ia - cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is double da){
+                if (b is int ib){
+                    return da - ib;
+                }
+                else if (b is double db){
+                    return da - db;
+                }
+                else if(b is Complex cb)
+                {
+                    return da - cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is Complex ca){
+                if (b is int ib){
+                    return ca - ib;
+                }
+                else if (b is double db){
+                    return ca - db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ca - cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            throw new SyntaxException("not number");
         }
 
         internal static object Divide(object a, object b){
-            return a switch{
-                int c when b is int e => c / e,
-                int c when b is double d => c / d,
-                int c when b is Complex cx => Complex.Divide(c, cx),
-                int => throw new InvalidCastException(),
-                double e when b is int f => e / f,
-                double e when b is double d => e / d,
-                double e when b is Complex cx => Complex.Divide(e, cx),
-                double => throw new InvalidCastException(),
-                Complex cx when b is int e => Complex.Divide(cx, e),
-                Complex cx when b is double d => Complex.Divide(cx, d),
-                Complex cx when b is Complex cx1 => Complex.Divide(cx, cx1),
-                _ => throw new InvalidCastException()
-            };
+            if (a is int ia){
+                if (b is int ib){
+                    return ia / ib;
+                }
+                else if (b is double db){
+                    return ia / db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ia / cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is double da){
+                if (b is int ib){
+                    return da / ib;
+                }
+                else if (b is double db){
+                    return da / db;
+                }
+                else if(b is Complex cb)
+                {
+                    return da / cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is Complex ca){
+                if (b is int ib){
+                    return ca / ib;
+                }
+                else if (b is double db){
+                    return ca / db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ca / cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            throw new SyntaxException("not number");
         }
 
         internal static object Multiply(object a, object b){
-            return a switch{
-                int ia when b is int ib => ia * ib,
-                int ia when b is double db => ia * db,
-                int ia when b is Complex cb => Complex.Multiply(ia, cb),
-                int => throw new InvalidCastException(),
-                double da when b is int ib => da * ib,
-                double da when b is double db => da * db,
-                double da when b is Complex cb => Complex.Multiply(da, cb),
-                double => throw new InvalidCastException(),
-                Complex ca when b is int ib => Complex.Multiply(ca, ib),
-                Complex ca when b is double db => Complex.Multiply(ca, db),
-                Complex ca when b is Complex cb => Complex.Multiply(ca, cb),
-                _ => throw new InvalidCastException()
-            };
+            if (a is int ia){
+                if (b is int ib){
+                    return ia * ib;
+                }
+                else if (b is double db){
+                    return ia * db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ia * cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is double da){
+                if (b is int ib){
+                    return da * ib;
+                }
+                else if (b is double db){
+                    return da * db;
+                }
+                else if(b is Complex cb)
+                {
+                    return da * cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            else if (a is Complex ca){
+                if (b is int ib){
+                    return ca * ib;
+                }
+                else if (b is double db){
+                    return ca * db;
+                }
+                else if(b is Complex cb)
+                {
+                    return ca * cb;
+                }
+                throw new SyntaxException("not number");
+            }
+            throw new SyntaxException("not number");
         }
 
         internal static bool TryParseImaginary(string s, out Complex? c){

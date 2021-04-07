@@ -4,26 +4,26 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 namespace CSharpLibraries.Interpreters{
-    internal sealed class InputPort : IDisposable{
+    public sealed class InputPort : IDisposable{
         private readonly TextReader _reader;
         private string _line = "";
-        private static readonly Queue<string> Queue = new(8);
+        private readonly Queue<string> Queue = new();
         private const string Tokenizer = "\\s*(,@|[('`,)]|\"(?:[\\\\].|[^\\\\\"])*\"|;.*|[^\\s('\"`,;)]*)";
         private static readonly Regex Pattern = new Regex(Tokenizer);
 
-        internal InputPort(string s){
+        public InputPort(string s){
             _reader = new StringReader(s);
         }
 
-        internal InputPort(TextReader console){
+        public InputPort(TextReader console){
             _reader = console;
         }
 
-        internal InputPort(FileInfo file){
-            _reader = new StreamReader(file.Create());
+        public InputPort(FileInfo file){
+            _reader = new StreamReader(file.OpenRead());
         }
 
-        internal object NextToken(){
+        public object NextToken(){
             while (true){
                 if (Queue.Count != 0){
                     return Queue.Dequeue();
@@ -42,7 +42,7 @@ namespace CSharpLibraries.Interpreters{
                 var matcher = Pattern.Match(_line);
                 while (matcher.Success){
                     var token = matcher.Groups[1].Value;
-                    if (!token.StartsWith(";")){
+                    if (!token.StartsWith(";") && !token.Equals("")){
                         Queue.Enqueue(token);
                     }
 

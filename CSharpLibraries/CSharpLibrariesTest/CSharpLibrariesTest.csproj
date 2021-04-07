@@ -6,6 +6,8 @@
         <IsPackable>false</IsPackable>
 
         <Nullable>disable</Nullable>
+
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,6 +18,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CSharpLibraries\CSharpLibraries.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="bin\Debug\net5.0\functions.ss" />
     </ItemGroup>
 
 </Project>

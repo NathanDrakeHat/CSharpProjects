@@ -8,10 +8,16 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <DebugType>full</DebugType>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="bin\Debug\net5.0\functions.ss" />
+      <None Include="bin\Debug\net5.0\lispytest.ss" />
+    </ItemGroup>
 
 </Project>
