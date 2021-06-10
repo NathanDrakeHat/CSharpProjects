@@ -78,12 +78,17 @@ namespace CSharpLibraries.Interpreters{
             }
         }
         
-        private void EvalAndPrint(object x) {
+        private void EvalAndPrint(object x, bool flush = false) {
             var val = Eval(x, _globalEnv);
             if (val != null) {
-                Console.WriteLine(EvalToString(val));
+                ConsoleBuffer.WriteLine(EvalToString(val));
+                if (flush){
+                    ConsoleBuffer.Flush();
+                }
             }
         }
+
+        internal TextWriter ConsoleBuffer = Console.Out;
         
         internal static readonly IList<object> Nil = new List<object>(0);
 
@@ -476,7 +481,7 @@ namespace CSharpLibraries.Interpreters{
             }
             catch (RuntimeWarning w){
                 if (w.Equals(ball)){
-                    return ball.returnValue;
+                    return ball.ReturnValue;
                 }
                 else{
                     throw;
@@ -485,7 +490,7 @@ namespace CSharpLibraries.Interpreters{
         }
 
         private static void Raise(object r, RuntimeWarning ball){
-            ball.returnValue = r;
+            ball.ReturnValue = r;
             throw ball;
         }
     }

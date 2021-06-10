@@ -20,6 +20,12 @@
       <None Include="bin\Debug\net5.0\lispytest.ss" />
       <None Include="bin\Release\net5.0\functions.ss" />
       <None Include="bin\Release\net5.0\lispytest.ss" />
+      <None Update="resources\functions.ss">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="resources\lispytest.ss">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

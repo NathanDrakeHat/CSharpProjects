@@ -19,7 +19,7 @@ namespace CSharpLibraries.Interpreters{
                         continue;
                     }
 
-                    EvalAndPrint(x);
+                    EvalAndPrint(x, true);
                 }
                 catch (Exception e){
                     Console.Error.WriteLine(e.Message);
@@ -37,13 +37,14 @@ namespace CSharpLibraries.Interpreters{
                         continue;
                     }
                     else if (x.Equals(SymEof)){
+                        ConsoleBuffer.Flush();
                         return;
                     }
 
                     EvalAndPrint(x);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.Message);
+                    ConsoleBuffer.WriteLine(e.Message);
                 }
             }
         }
@@ -61,13 +62,14 @@ namespace CSharpLibraries.Interpreters{
                         continue;
                     }
                     else if (x.Equals(SymEof)){
+                        ConsoleBuffer.Flush();
                         return;
                     }
 
                     Eval(x, _globalEnv);
                 }
                 catch (Exception e){
-                    Console.Error.WriteLine(e.Message);
+                    ConsoleBuffer.WriteLine(e.Message);
                 }
             }
         }

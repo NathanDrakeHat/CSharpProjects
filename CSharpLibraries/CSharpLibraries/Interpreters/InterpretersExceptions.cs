@@ -1,14 +1,14 @@
 ﻿using System;
 
 namespace CSharpLibraries.Interpreters{
-    internal class InterpretersExceptions{
+    internal static class InterpretersExceptions{
         public class SyntaxException : Exception{
             public SyntaxException(string s) : base(s){
             }
         }
 
         public class RuntimeWarning : Exception{
-            public object returnValue;
+            public object ReturnValue;
 
             public RuntimeWarning(string m) : base(m){
             }

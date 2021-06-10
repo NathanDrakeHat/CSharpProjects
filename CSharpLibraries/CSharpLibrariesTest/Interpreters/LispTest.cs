@@ -122,7 +122,7 @@ namespace CSharpLibrariesTest.Interpreters{
 
         [Test]
         public static void LispyTest(){
-            Interpreter.LoadLib(new FileInfo("functions.ss"));
+            Interpreter.LoadLib(new FileInfo("resources/functions.ss"));
             var t = Interpreter.EvalScripts("(quote (testing 1 (2.0) -3.14e159))");
             var tt = new List<object>{new Symbol("testing"), 1, new List<object>{2.0}, -3.14e159};
             Assert.AreEqual(tt, t);

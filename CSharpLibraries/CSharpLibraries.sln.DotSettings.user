@@ -5,10 +5,13 @@
 	
 	<s:Int64 x:Key="/Default/Environment/Hierarchy/Build/SolutionBuilderNext/ParallelProcessesCount2/@EntryValue">6</s:Int64>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1ced308a_002D9ef0_002D497b_002Da73b_002D55070994f170/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;And&gt;&#xD;
-    &lt;Project Location="C:\Users\Nathan\RiderProjects\CSharpProjects\CSharpLibraries\CSharpLibrariesTest" Presentation="&amp;lt;CSharpLibrariesTest&amp;gt;" /&gt;&#xD;
-    &lt;Namespace&gt;CSharpLibrariesTest.Interpreters&lt;/Namespace&gt;&#xD;
-  &lt;/And&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;And&gt;&#xD;
+      &lt;Project Location="C:\Users\Nathan\RiderProjects\CSharpProjects\CSharpLibraries\CSharpLibrariesTest" Presentation="&amp;lt;CSharpLibrariesTest&amp;gt;" /&gt;&#xD;
+      &lt;Namespace&gt;CSharpLibrariesTest.Interpreters&lt;/Namespace&gt;&#xD;
+    &lt;/And&gt;&#xD;
+    &lt;ProjectFolder&gt;F46353FF-C23E-453A-826C-7F72C6FC0A93/d:Leetcode&lt;/ProjectFolder&gt;&#xD;
+  &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	
