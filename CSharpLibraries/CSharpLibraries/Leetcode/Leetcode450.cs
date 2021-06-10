@@ -1,4 +1,4 @@
 ﻿namespace CSharpLibraries.Leetcode{
-    public class Leetcode450{
-    }
+  public class Leetcode450{
+  }
 }
