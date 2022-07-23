@@ -1,2 +1,2 @@
 # CSharpProjects
-I am too lazy to put these projects seperately
+C# implementation of "CentralLibJ", "Jispy" and other miscellaneous projects. Archived to avoid repetitive development burden.
